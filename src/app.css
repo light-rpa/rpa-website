@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+/* RPA Brand Colors */
+@theme {
+	--color-rpa-blue: #0055a4;
+	--color-rpa-blue-light: #3380c4;
+	--color-rpa-blue-dark: #003d7a;
+	--color-rpa-navy: #1a1a2e;
+	--color-rpa-gray: #f5f5f7;
+	--color-rpa-accent: #00b4d8;
+}
