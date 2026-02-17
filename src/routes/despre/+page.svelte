@@ -38,7 +38,7 @@
 <section class="py-28 bg-white">
 	<div class="max-w-7xl mx-auto px-6 lg:px-8">
 		<div class="grid md:grid-cols-2 gap-16 items-center">
-			<div class="reveal">
+			<div use:reveal>
 				<div class="accent-line mb-6"></div>
 				<h2 class="font-heading text-3xl md:text-4xl font-bold text-rpa-navy mb-6">Cine Suntem</h2>
 				<p class="text-gray-500 mb-5 leading-relaxed">
@@ -53,7 +53,7 @@
 			</div>
 
 			<!-- Stats card -->
-			<div class="reveal">
+			<div use:reveal>
 				<div class="bg-rpa-gray rounded-2xl p-10 border border-gray-100">
 					<div class="flex items-center gap-3 mb-10">
 						<div class="w-10 h-10 rounded-lg bg-rpa-accent/10 border border-rpa-accent/30 flex items-center justify-center">
@@ -92,7 +92,7 @@
 <!-- Mission -->
 <section class="py-28 bg-rpa-gray">
 	<div class="max-w-5xl mx-auto px-6 lg:px-8">
-		<div class="text-center mb-16 reveal">
+		<div class="text-center mb-16" use:reveal>
 			<div class="accent-line mx-auto mb-6"></div>
 			<h2 class="font-heading text-3xl md:text-4xl font-bold text-rpa-navy mb-6">Misiunea Noastră</h2>
 			<p class="text-xl text-gray-500 leading-relaxed max-w-3xl mx-auto">
@@ -102,7 +102,7 @@
 
 		<div class="grid md:grid-cols-3 gap-8">
 			{#each values as val, i}
-				<div class="reveal bg-white rounded-2xl p-8 border border-gray-100 hover-lift" style="transition-delay: {i * 100}ms">
+				<div class="bg-white rounded-2xl p-8 border border-gray-100 hover-lift" use:reveal style="transition-delay: {i * 100}ms">
 					<div class="w-14 h-14 rounded-xl bg-rpa-navy/5 flex items-center justify-center mb-6">
 						{@html val.icon}
 					</div>
@@ -117,14 +117,14 @@
 <!-- What We Do -->
 <section class="py-28 bg-white">
 	<div class="max-w-7xl mx-auto px-6 lg:px-8">
-		<div class="max-w-2xl mb-16 reveal">
+		<div class="max-w-2xl mb-16" use:reveal>
 			<div class="accent-line mb-6"></div>
 			<h2 class="font-heading text-3xl md:text-4xl font-bold text-rpa-navy">Ce Facem</h2>
 		</div>
 
 		<div class="space-y-6">
 			{#each capabilities as cap, i}
-				<div class="reveal flex gap-6 items-start bg-rpa-gray rounded-2xl p-8 border border-gray-100 hover-lift" style="transition-delay: {i * 80}ms">
+				<div class="flex gap-6 items-start bg-rpa-gray rounded-2xl p-8 border border-gray-100 hover-lift" use:reveal style="transition-delay: {i * 80}ms">
 					<div class="w-14 h-14 rounded-xl bg-white flex items-center justify-center shrink-0 border border-gray-100">
 						{@html cap.icon}
 					</div>
@@ -144,7 +144,7 @@
 	<div class="absolute top-10 left-10 w-64 h-64 border border-rpa-accent/5 rounded-full"></div>
 
 	<div class="relative z-10 max-w-5xl mx-auto px-6 lg:px-8">
-		<div class="text-center mb-16 reveal">
+		<div class="text-center mb-16" use:reveal>
 			<div class="accent-line mx-auto mb-6"></div>
 			<h2 class="font-heading text-3xl md:text-4xl font-bold mb-6">Partener SICK</h2>
 			<p class="text-lg text-gray-300/90 leading-relaxed max-w-2xl mx-auto">
@@ -154,7 +154,7 @@
 
 		<div class="grid sm:grid-cols-3 gap-6">
 			{#each sickFeatures as feat, i}
-				<div class="reveal border border-white/10 rounded-2xl p-8 bg-white/[0.02] backdrop-blur-sm hover-lift" style="transition-delay: {i * 100}ms">
+				<div class="border border-white/10 rounded-2xl p-8 bg-white/[0.02] backdrop-blur-sm hover-lift" use:reveal style="transition-delay: {i * 100}ms">
 					<div class="w-12 h-12 rounded-xl bg-rpa-accent/10 flex items-center justify-center mb-5">
 						{@html feat.icon}
 					</div>
@@ -168,7 +168,7 @@
 
 <!-- CTA -->
 <section class="py-28 bg-rpa-gray">
-	<div class="max-w-3xl mx-auto px-6 lg:px-8 text-center reveal">
+	<div class="max-w-3xl mx-auto px-6 lg:px-8 text-center" use:reveal>
 		<h2 class="font-heading text-3xl md:text-4xl font-bold text-rpa-navy mb-6">Hai Să Colaborăm</h2>
 		<p class="text-gray-500 mb-10 text-lg">Contactați-ne pentru a discuta despre următorul dumneavoastră proiect de automatizare.</p>
 		<a href="/contact" class="inline-flex items-center gap-2 bg-rpa-accent hover:bg-rpa-accent-light text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200">
@@ -179,6 +179,8 @@
 </section>
 
 <script lang="ts">
+	import { reveal } from '$lib/actions/animate';
+
 	const values = [
 		{
 			icon: '<svg class="w-7 h-7 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',

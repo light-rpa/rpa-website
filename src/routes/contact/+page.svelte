@@ -39,7 +39,7 @@
 	<div class="max-w-7xl mx-auto px-6 lg:px-8">
 		<div class="grid lg:grid-cols-3 gap-12">
 			<!-- Form -->
-			<div class="lg:col-span-2 reveal">
+			<div class="lg:col-span-2" use:reveal>
 				<div class="accent-line mb-6"></div>
 				<h2 class="font-heading text-2xl font-bold text-rpa-navy mb-8">Trimite-ne un Mesaj</h2>
 
@@ -111,7 +111,7 @@
 			</div>
 
 			<!-- Sidebar -->
-			<div class="space-y-6 reveal">
+			<div class="space-y-6" use:reveal>
 				<div class="bg-rpa-gray rounded-2xl p-8 border border-gray-100">
 					<h3 class="font-heading font-bold text-rpa-navy mb-6">Informații de Contact</h3>
 					<div class="space-y-5">
@@ -172,6 +172,8 @@
 </section>
 
 <script lang="ts">
+	import { reveal } from '$lib/actions/animate';
+
 	let submitted = $state(false);
 	let formData = $state({
 		name: '',
