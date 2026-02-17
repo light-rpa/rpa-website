@@ -108,14 +108,62 @@
     "name": "entries/pages/_layout.svelte",
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
+    "imports": [
+      "_index.js"
+    ],
     "css": [
-      "_app/immutable/assets/_layout.DE-rpyZC.css"
+      "_app/immutable/assets/_layout.3XRz4YfC.css"
     ]
   },
   "src/routes/+page.svelte": {
     "file": "entries/pages/_page.svelte.js",
     "name": "entries/pages/_page.svelte",
     "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/contact/+page.svelte": {
+    "file": "entries/pages/contact/_page.svelte.js",
+    "name": "entries/pages/contact/_page.svelte",
+    "src": "src/routes/contact/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/despre/+page.svelte": {
+    "file": "entries/pages/despre/_page.svelte.js",
+    "name": "entries/pages/despre/_page.svelte",
+    "src": "src/routes/despre/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/gdpr/+page.svelte": {
+    "file": "entries/pages/gdpr/_page.svelte.js",
+    "name": "entries/pages/gdpr/_page.svelte",
+    "src": "src/routes/gdpr/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/industrii/+page.svelte": {
+    "file": "entries/pages/industrii/_page.svelte.js",
+    "name": "entries/pages/industrii/_page.svelte",
+    "src": "src/routes/industrii/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/servicii/+page.svelte": {
+    "file": "entries/pages/servicii/_page.svelte.js",
+    "name": "entries/pages/servicii/_page.svelte",
+    "src": "src/routes/servicii/+page.svelte",
     "isEntry": true,
     "imports": [
       "_index.js"
