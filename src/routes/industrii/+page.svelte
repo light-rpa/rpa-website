@@ -1,6 +1,24 @@
 <svelte:head>
-	<title>Industrii — R.P.A. | Soluții pe Sectoare</title>
-	<meta name="description" content="Soluții de automatizare industrială pentru automotive, food & beverage, logistică și electronică. R.P.A. — experiență în diverse sectoare." />
+	<title>Industrii — Energie, ESS, AMR și Conveioare | R.P.A.</title>
+	<meta
+		name="description"
+		content="Energy storage systems Romania, AMR, conveioare industriale și automatizare pentru automotive, food & beverage, logistică și electronică."
+	/>
+	<meta property="og:title" content="Industrii — Energie & Automatizare R.P.A." />
+	<meta
+		property="og:description"
+		content="Capabilități pentru energie și stocare, logistică, automotive, food & beverage și electronică în România."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rpa.ro/industrii" />
+	<meta property="og:image" content="https://rpa.ro/infinity-logo-v3.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Industrii deservite — R.P.A." />
+	<meta
+		name="twitter:description"
+		content="Integrare ESS, AMR și conveioare pentru energie, logistică, automotive, food & beverage și electronică."
+	/>
+	<meta name="twitter:image" content="https://rpa.ro/infinity-logo-v3.png" />
 </svelte:head>
 
 <!-- Hero -->
@@ -11,7 +29,7 @@
 		<div class="accent-line mx-auto mb-6 animate-fade-in-up"></div>
 		<h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in-up delay-100">Industrii</h1>
 		<p class="text-xl text-gray-300/90 max-w-2xl mx-auto animate-fade-in-up delay-200">
-			Soluții de automatizare adaptate cerințelor specifice fiecărui sector industrial.
+			Soluții ESS, AMR, conveioare și automatizare adaptate cerințelor energiei, logisticii, automotive, food & beverage și electronicii.
 		</p>
 	</div>
 </section>
@@ -58,6 +76,12 @@
 
 <script lang="ts">
 	const industries = [
+		{
+			icon: '<svg class="w-8 h-8 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M12 7V3"/><path d="M9 17v2"/><path d="M15 17v2"/><path d="M7 11h10"/><path d="M7 13h6"/></svg>',
+			name: 'Energie & Stocare',
+			description: 'Energy storage systems Romania pentru parcuri fotovoltaice, microgrid industrial și backup de înaltă putere, cu integrare EMS/BMS și siguranță la incendiu.',
+			applications: ['Energy Storage Systems', 'Microgrid Control', 'PCS & HV Rooms', 'Fire Safety & HVAC', 'Monitorizare SOC', 'Service 24/7']
+		},
 		{
 			icon: '<svg class="w-8 h-8 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
 			name: 'Automotive',

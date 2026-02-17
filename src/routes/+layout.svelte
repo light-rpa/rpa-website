@@ -7,6 +7,38 @@
 
 	let { children } = $props();
 	let mobileOpen = $state(false);
+	const siteUrl = 'https://rpa.ro';
+	const canonicalUrl = $derived(() => new URL(page.url.pathname + page.url.search, siteUrl).toString());
+	const structuredOrganization = {
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: 'R.P.A. — Robotic Process Automation',
+		url: siteUrl,
+		logo: `${siteUrl}/infinity-logo-v3.png`,
+		contactPoint: [
+			{
+				'@type': 'ContactPoint',
+				telephone: '+40 751 271 751',
+				contactType: 'customer support',
+				areaServed: 'RO',
+				availableLanguage: ['ro', 'en']
+			}
+		],
+		sameAs: [siteUrl]
+	};
+	const structuredLocalBusiness = $derived(() => ({
+		'@context': 'https://schema.org',
+		'@type': 'LocalBusiness',
+		name: 'R.P.A. — Robotic Process Automation',
+		url: canonicalUrl,
+		image: `${siteUrl}/infinity-logo-v3.png`,
+		telephone: '+40 751 271 751',
+		address: {
+			'@type': 'PostalAddress',
+			addressCountry: 'RO',
+			addressLocality: 'România'
+		}
+	}));
 
 	const navLinks = [
 		{ href: '/', label: 'Acasă' },
@@ -21,6 +53,15 @@
 		return page.url.pathname.startsWith(href);
 	}
 </script>
+
+<svelte:head>
+	<link rel="canonical" href={canonicalUrl} />
+	<link rel="alternate" hreflang="ro-ro" href={canonicalUrl} />
+	<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+	<meta property="og:site_name" content="R.P.A. — Robotic Process Automation" />
+	<script type="application/ld+json">{JSON.stringify(structuredOrganization)}</script>
+	<script type="application/ld+json">{JSON.stringify(structuredLocalBusiness)}</script>
+</svelte:head>
 
 <!-- Navbar -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-rpa-navy/95 backdrop-blur-sm border-b border-white/10">
@@ -91,8 +132,7 @@
 					</div>
 				</div>
 				<p class="text-sm leading-relaxed">
-					Soluții de automatizare industrială, viziune artificială și integrare robotică.
-					Partener autorizat SICK.
+					Integrare de sisteme ESS, roboți mobili AMR, conveioare industriale și viziune artificială pentru producția din România. Partener autorizat SICK.
 				</p>
 			</div>
 

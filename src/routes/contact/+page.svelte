@@ -1,6 +1,24 @@
 <svelte:head>
-	<title>Contact — R.P.A. | Automatizare Industrială</title>
-	<meta name="description" content="Contactați R.P.A. pentru soluții de automatizare industrială. Telefon: +40 751 271 751, Email: office@rpa.ro" />
+	<title>Contact — R.P.A. | ESS, AMR și Conveioare în România</title>
+	<meta
+		name="description"
+		content="Luați legătura cu R.P.A. pentru proiecte de baterii ESS, AMR roboți mobili autonomi, conveioare industriale și automatizare în România."
+	/>
+	<meta property="og:title" content="Contact R.P.A. — Integrator ESS & AMR" />
+	<meta
+		property="og:description"
+		content="Telefon +40 751 271 751 | office@rpa.ro. Discutăm despre baterii ESS Romania, AMR și conveioare industriale."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rpa.ro/contact" />
+	<meta property="og:image" content="https://rpa.ro/infinity-logo-v3.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Contact R.P.A. — Automatizare Industrială" />
+	<meta
+		name="twitter:description"
+		content="Trimite-ne un mesaj pentru ESS, AMR, conveioare, machine vision și senzori SICK."
+	/>
+	<meta name="twitter:image" content="https://rpa.ro/infinity-logo-v3.png" />
 </svelte:head>
 
 <!-- Hero -->
@@ -11,7 +29,7 @@
 		<div class="accent-line mx-auto mb-6 animate-fade-in-up"></div>
 		<h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in-up delay-100">Contactează-ne</h1>
 		<p class="text-xl text-gray-300/90 max-w-2xl mx-auto animate-fade-in-up delay-200">
-			Suntem aici să vă ajutăm. Completați formularul sau contactați-ne direct.
+			Suntem aici să discutăm despre baterii ESS, flote AMR, conveioare industriale și automatizare completă. Completați formularul sau contactați-ne direct.
 		</p>
 	</div>
 </section>

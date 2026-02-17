@@ -1,6 +1,24 @@
 <svelte:head>
-	<title>Politica de Confidențialitate — R.P.A.</title>
-	<meta name="description" content="Politica de confidențialitate și protecția datelor personale conform GDPR — R.P.A. Robotic Process Automation." />
+	<title>Politica de Confidențialitate — R.P.A. ESS, AMR & Automatizare</title>
+	<meta
+		name="description"
+		content="Politica GDPR pentru R.P.A., integrator de baterii ESS, AMR și conveioare industriale în România. Aflați cum protejăm datele de contact și proiect."
+	/>
+	<meta property="og:title" content="Politica GDPR — R.P.A." />
+	<meta
+		property="og:description"
+		content="Transparență privind datele colectate pentru proiecte de energy storage systems, AMR și conveioare în România."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rpa.ro/gdpr" />
+	<meta property="og:image" content="https://rpa.ro/infinity-logo-v3.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Politica de confidențialitate R.P.A." />
+	<meta
+		name="twitter:description"
+		content="Protecția datelor pentru clienții ESS, AMR, conveioare, machine vision și automatizare industrială."
+	/>
+	<meta name="twitter:image" content="https://rpa.ro/infinity-logo-v3.png" />
 </svelte:head>
 
 <!-- Hero -->

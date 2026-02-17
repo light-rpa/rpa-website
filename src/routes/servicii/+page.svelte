@@ -1,19 +1,79 @@
 <svelte:head>
-	<title>Servicii — R.P.A. | Cercetare, Implementare, Suport</title>
-	<meta name="description" content="Servicii complete de automatizare industrială: cercetare și design, implementare profesională, suport tehnic și mentenanță." />
-	<meta property="og:title" content="Servicii — R.P.A." />
-	<meta property="og:description" content="Servicii complete de automatizare industrială: cercetare, implementare, suport." />
+	<title>Servicii — ESS, AMR și Conveioare | R.P.A.</title>
+	<meta
+		name="description"
+		content="Servicii end-to-end pentru baterii ESS Romania, AMR roboți mobili autonomi, conveioare industriale, machine vision și integrare robotică."
+	/>
+	<meta property="og:title" content="Servicii — R.P.A. Integrator ESS, AMR, Conveioare" />
+	<meta
+		property="og:description"
+		content="Engineering, implementare și mentenanță pentru energy storage systems Romania, AMR și conveioare inteligente."
+	/>
 	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rpa.ro/servicii" />
+	<meta property="og:image" content="https://rpa.ro/infinity-logo-v3.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Servicii ESS • AMR • Conveioare — R.P.A." />
+	<meta
+		name="twitter:description"
+		content="Consultanță, integrare și suport pentru baterii ESS Romania, AMR roboți mobili autonomi și conveioare industriale."
+	/>
+	<meta name="twitter:image" content="https://rpa.ro/infinity-logo-v3.png" />
 </svelte:head>
 
 <script lang="ts">
 	import { reveal } from '$lib/actions/animate';
-	import { FlaskConical, Cog, ShieldCheck, Wrench, MonitorCog, Plug, ClipboardCheck, BookOpen, GraduationCap, PhoneCall, Settings, Rocket } from 'lucide-svelte';
+	import {
+		FlaskConical,
+		Cog,
+		ShieldCheck,
+		Wrench,
+		MonitorCog,
+		Plug,
+		ClipboardCheck,
+		BookOpen,
+		GraduationCap,
+		PhoneCall,
+		Settings,
+		Rocket,
+		BatteryCharging,
+		Bot,
+		Cable,
+		ScanLine
+	} from 'lucide-svelte';
+
+	const flagshipSolutions = [
+		{
+			icon: BatteryCharging,
+			title: 'Baterii ESS & Energy Storage',
+			description: 'Dimensionare, BMS, integrare EMS/SCADA și comisionare pentru energy storage systems Romania.',
+			bullets: ['Containerizare LFP/LMFP', 'Protecție incendiu, HVAC, PCS', 'Documentație ANRE & SR EN 62933']
+		},
+		{
+			icon: Bot,
+			title: 'AMR — Roboți Mobili Autonomi',
+			description: 'Analizăm fluxurile logistice, alegem platforma AMR și integrăm fleet manager cu WMS/MES.',
+			bullets: ['Cartografiere și simulare SLAM', 'Fleet manager + traffic control', 'Safety SICK și PLC interlock']
+		},
+		{
+			icon: Cable,
+			title: 'Conveioare & Intralogistică',
+			description: 'Proiectăm conveioare modulare, transferuri hibride AMR + conveioare și structuri inox/IP65.',
+			bullets: ['Lanț, bandă, role motorizate', 'Condition monitoring și vibrații', 'Integrare PLC, VFD, machine vision']
+		},
+		{
+			icon: ScanLine,
+			title: 'Machine Vision & Control Calitate',
+			description: 'Camere 2D/3D, algoritmi AI și senzori SICK pentru trasabilitate și ghidare robotică.',
+			bullets: ['Inspecție de suprafață', 'Citire coduri și OCR', 'Ghidare robotică 3D']
+		}
+	];
 
 	const researchItems = [
 		'Analiză detaliată a proceselor existente',
 		'Studii de fezabilitate și ROI',
 		'Design ingineresc 3D și simulare',
+		'Simulări digitale pentru ESS, AMR și conveioare',
 		'Prototipare rapidă și testare PoC',
 		'Documentație tehnică completă',
 		'Selectarea optimă a componentelor'
@@ -30,6 +90,8 @@
 		'Achiziție și management componente',
 		'Asamblare și integrare mecanică',
 		'Programare PLC, HMI și roboți',
+		'Skid-uri ESS, PCS și integrare HVAC',
+		'Sincronizare AMR cu conveioare inteligente',
 		'Instalare și configurare la fața locului',
 		'Teste de acceptanță (FAT/SAT)',
 		'Training operatori și documentație'
@@ -46,7 +108,9 @@
 
 	const supportItems = [
 		'Suport tehnic telefonic și remote 24/7',
+		'Monitorizare SOC și temperatură pentru ESS',
 		'Mentenanță preventivă programată',
+		'Fleet management AMR și actualizări OTA',
 		'Intervenții rapide la fața locului',
 		'Actualizări software și optimizare',
 		'Piese de schimb și consumabile',
@@ -57,17 +121,17 @@
 		{
 			icon: PhoneCall,
 			title: 'Suport Remote',
-			desc: 'Asistență telefonică și acces remote pentru diagnosticare rapidă și rezolvare probleme.'
+			desc: 'Asistență telefonică și acces remote pentru ESS, AMR și conveioare, cu diagnosticare și resetări controlate.'
 		},
 		{
 			icon: Settings,
 			title: 'Mentenanță Preventivă',
-			desc: 'Inspecții programate, calibrare și înlocuire componente uzate pentru funcționare optimă.'
+			desc: 'Inspecții programate, calibrare BMS, verificări safety și lanțuri conveioare pentru funcționare optimă.'
 		},
 		{
 			icon: Rocket,
 			title: 'Optimizare Continuă',
-			desc: 'Analiză performanță, actualizări software și îmbunătățiri pentru productivitate maximă.'
+			desc: 'Analiză performanță, actualizări software/fleet, optimizări energetice și rapoarte pentru management.'
 		}
 	];
 </script>
@@ -77,8 +141,40 @@
 	<div class="max-w-4xl mx-auto px-6 text-center">
 		<h1 class="text-4xl md:text-5xl font-extrabold mb-6">Serviciile Noastre</h1>
 		<p class="text-xl text-gray-300 max-w-2xl mx-auto">
-			De la concept la realitate — și dincolo de ea. Oferim servicii complete pe întreg ciclul de viață al proiectului.
+			Baterii ESS, flote AMR, conveioare industriale și machine vision — toate integrate de aceeași echipă.
 		</p>
+	</div>
+</section>
+
+<!-- Flagship Solutions -->
+<section class="py-24 bg-white">
+	<div class="max-w-6xl mx-auto px-6">
+		<div class="text-center max-w-3xl mx-auto mb-16">
+			<p class="text-sm font-semibold tracking-[0.3em] text-rpa-accent" use:reveal>FOCUS STRATEGIC</p>
+			<h2 class="text-3xl md:text-4xl font-bold text-rpa-navy mt-4" use:reveal>Soluții critice livrate end-to-end</h2>
+			<p class="text-gray-600 mt-4" use:reveal>
+				Consultanță, engineering, implementare și suport pentru baterii ESS România, AMR roboți mobili autonomi și conveioare industriale grele.
+			</p>
+		</div>
+		<div class="grid md:grid-cols-2 gap-8">
+			{#each flagshipSolutions as solution}
+				<div class="bg-rpa-gray rounded-2xl p-8 border border-gray-100 card-hover" use:reveal>
+					<div class="w-12 h-12 bg-rpa-accent/10 rounded-xl flex items-center justify-center mb-4">
+						<solution.icon class="w-6 h-6 text-rpa-accent" />
+					</div>
+					<h3 class="text-xl font-bold text-rpa-navy mb-3">{solution.title}</h3>
+					<p class="text-gray-600 mb-4">{solution.description}</p>
+					<ul class="space-y-2 text-sm text-gray-600">
+						{#each solution.bullets as item}
+							<li class="flex items-start gap-2">
+								<span class="text-rpa-accent font-bold mt-0.5">•</span>
+								<span>{item}</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/each}
+		</div>
 	</div>
 </section>
 

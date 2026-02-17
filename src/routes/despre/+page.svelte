@@ -1,6 +1,24 @@
 <svelte:head>
-	<title>Despre Noi — R.P.A. | Automatizare Industrială</title>
-	<meta name="description" content="Aflați mai multe despre R.P.A. — compania românească specializată în automatizare industrială, viziune artificială și integrare robotică." />
+	<title>Despre R.P.A. — Integrator ESS, AMR, Conveioare și Automatizare</title>
+	<meta
+		name="description"
+		content="R.P.A. este integrator românesc de baterii ESS, roboți mobili AMR, conveioare industriale, machine vision, robotică și senzori SICK."
+	/>
+	<meta property="og:title" content="Despre R.P.A. — Energie & Automatizare" />
+	<meta
+		property="og:description"
+		content="Integrator românesc pentru energy storage systems, AMR și conveioare, cu focus pe machine vision și senzori SICK."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rpa.ro/despre" />
+	<meta property="og:image" content="https://rpa.ro/infinity-logo-v3.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Despre R.P.A. — Integrator Industrial" />
+	<meta
+		name="twitter:description"
+		content="Echipă românească specializată în baterii ESS, AMR, conveioare și automatizare industrială."
+	/>
+	<meta name="twitter:image" content="https://rpa.ro/infinity-logo-v3.png" />
 </svelte:head>
 
 <!-- Hero -->
@@ -24,13 +42,13 @@
 				<div class="accent-line mb-6"></div>
 				<h2 class="font-heading text-3xl md:text-4xl font-bold text-rpa-navy mb-6">Cine Suntem</h2>
 				<p class="text-gray-500 mb-5 leading-relaxed">
-					R.P.A. (Robotic Process Automation) este o companie românească specializată în dezvoltarea și integrarea soluțiilor de automatizare industrială. Cu o echipă de ingineri experimentați, oferim servicii complete — de la faza de cercetare și design până la implementare și suport tehnic continuu.
+					R.P.A. (Robotic Process Automation) este o companie românească specializată în dezvoltarea și integrarea soluțiilor de automatizare industrială. În prezent, focusul nostru major include baterii ESS (energy storage systems), flote AMR și conveioare industriale robuste, alături de machine vision și robotică.
 				</p>
 				<p class="text-gray-500 mb-5 leading-relaxed">
-					Ne concentrăm pe viziunea artificială, integrarea robotică și automatizarea proceselor complexe, aducând tehnologie de ultimă generație în fabricile și liniile de producție din România și din Europa.
+					Ne concentrăm pe viziunea artificială, integrarea robotică, senzori SICK și automatizarea proceselor complexe astfel încât ESS, AMR și conveioarele inteligente să funcționeze într-un ecosistem comun, gata pentru auditorii OEM și cerințele pieței din România și Europa.
 				</p>
 				<p class="text-gray-500 leading-relaxed">
-					Fiecare proiect pe care îl dezvoltăm este personalizat la cerințele specifice ale clientului, asigurând o integrare perfectă cu procesele existente și un randament maxim al investiției.
+					Fiecare proiect este personalizat la cerințele specifice ale clientului — de la energy storage systems Romania până la intralogistică pentru automotive — pentru o integrare perfectă cu procesele existente și un randament maxim al investiției.
 				</p>
 			</div>
 
@@ -180,6 +198,21 @@
 	];
 
 	const capabilities = [
+		{
+			icon: '<svg class="w-7 h-7 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M12 7V3"/><path d="M9 17v2"/><path d="M15 17v2"/></svg>',
+			title: 'Sisteme ESS & Energy Storage',
+			description: 'Proiectăm, containerizăm și monitorizăm baterii ESS (LFP/LMFP), BMS, PCS și EMS pentru energy storage systems Romania.'
+		},
+		{
+			icon: '<svg class="w-7 h-7 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="2"/><path d="M5 22a7 7 0 0 1 14 0"/><path d="M6 14h12"/><path d="M7 18h10"/></svg>',
+			title: 'AMR & Intralogistică',
+			description: 'Selectăm platforme AMR, configurăm fleet manager, safety SICK și interfața cu conveioarele și sistemele WMS/MES.'
+		},
+		{
+			icon: '<svg class="w-7 h-7 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18"/><path d="M3 14h18"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>',
+			title: 'Conveioare Industriale',
+			description: 'Inginerie și execuție de conveioare modulare, lanț, bandă și role motorizate, sincronizate cu AMR și machine vision.'
+		},
 		{
 			icon: '<svg class="w-7 h-7 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>',
 			title: 'Integrare Robotică',

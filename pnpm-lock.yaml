@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      lucide-svelte:
+        specifier: ^0.571.0
+        version: 0.571.0(svelte@5.51.2)
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^7.0.1
@@ -693,6 +697,11 @@ packages:
   locate-character@3.0.0:
     resolution: {integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==}
 
+  lucide-svelte@0.571.0:
+    resolution: {integrity: sha512-I8HV1ZVDO7IQAZFZLeiXyi1AzOSYE1Lss2fYvnjPfOEjv4AeAnY0weVIFFZ4lsbo6C1h/W26gXsruEWzpZiB1A==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
+
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -1317,6 +1326,10 @@ snapshots:
       lightningcss-win32-x64-msvc: 1.30.2
 
   locate-character@3.0.0: {}
+
+  lucide-svelte@0.571.0(svelte@5.51.2):
+    dependencies:
+      svelte: 5.51.2
 
   magic-string@0.30.21:
     dependencies:
