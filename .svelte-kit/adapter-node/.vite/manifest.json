@@ -10,6 +10,20 @@
       "_internal.js"
     ]
   },
+  "_Icon.js": {
+    "file": "chunks/Icon.js",
+    "name": "Icon",
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_InfinityLogo.js": {
+    "file": "chunks/InfinityLogo.js",
+    "name": "InfinityLogo",
+    "imports": [
+      "_index.js"
+    ]
+  },
   "_environment.js": {
     "file": "chunks/environment.js",
     "name": "environment"
@@ -26,11 +40,22 @@
     "file": "chunks/false.js",
     "name": "false"
   },
+  "_html.js": {
+    "file": "chunks/html.js",
+    "name": "html"
+  },
   "_index.js": {
     "file": "chunks/index.js",
+    "name": "index"
+  },
+  "_index2.js": {
+    "file": "chunks/index2.js",
     "name": "index",
     "imports": [
-      "_utils2.js"
+      "_index.js",
+      "_exports.js",
+      "_root.js",
+      "_utils.js"
     ]
   },
   "_internal.js": {
@@ -53,22 +78,25 @@
     "file": "chunks/shared.js",
     "name": "shared",
     "imports": [
-      "_utils.js",
-      "_utils2.js"
+      "_utils.js"
+    ]
+  },
+  "_shield-check.js": {
+    "file": "chunks/shield-check.js",
+    "name": "shield-check",
+    "imports": [
+      "_index.js",
+      "_Icon.js"
     ]
   },
   "_utils.js": {
     "file": "chunks/utils.js",
     "name": "utils"
   },
-  "_utils2.js": {
-    "file": "chunks/utils2.js",
-    "name": "utils"
-  },
-  "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+  "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
     "file": "remote-entry.js",
     "name": "remote-entry",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "src": "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
     "isEntry": true,
     "imports": [
       "_shared.js",
@@ -76,28 +104,25 @@
       "_environment.js"
     ]
   },
-  "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
     "file": "entries/fallbacks/error.svelte.js",
     "name": "entries/fallbacks/error.svelte",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_exports.js",
-      "_root.js",
-      "_utils.js"
+      "_index2.js"
     ]
   },
-  "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+  "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
     "file": "index.js",
     "name": "index",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.52.0_@sveltejs+vite-plugin-svelte@6.2.4_svelte@5.51.2_vite@7.3.1_jiti@2_bca2146babeaaa98846505fc00927132/node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "src": "node_modules/@sveltejs/kit/src/runtime/server/index.js",
     "isEntry": true,
     "imports": [
       "_false.js",
       "_environment.js",
       "_shared.js",
-      "_index.js",
       "_exports.js",
       "_utils.js",
       "_internal.js"
@@ -109,10 +134,13 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_index2.js",
+      "_InfinityLogo.js",
+      "_Icon.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.3XRz4YfC.css"
+      "_app/immutable/assets/_layout.D_JvXFWn.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -121,7 +149,10 @@
     "src": "src/routes/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_InfinityLogo.js",
+      "_shield-check.js",
+      "_Icon.js"
     ]
   },
   "src/routes/contact/+page.svelte": {
@@ -139,7 +170,8 @@
     "src": "src/routes/despre/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_html.js"
     ]
   },
   "src/routes/gdpr/+page.svelte": {
@@ -157,7 +189,8 @@
     "src": "src/routes/industrii/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_html.js"
     ]
   },
   "src/routes/servicii/+page.svelte": {
@@ -166,7 +199,9 @@
     "src": "src/routes/servicii/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_shield-check.js",
+      "_Icon.js"
     ]
   }
 }

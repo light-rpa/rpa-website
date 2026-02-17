@@ -1,13 +1,15 @@
-import { B as BROWSER } from "./chunks/false.js";
+import { b as browser } from "./chunks/false.js";
 import { json, text, error } from "@sveltejs/kit";
 import { Redirect, SvelteKitError, ActionFailure, HttpError } from "@sveltejs/kit/internal";
 import { with_request_store, merge_tracing, try_get_request_store } from "@sveltejs/kit/internal/server";
 import { a as assets, b as base, c as app_dir, r as relative, o as override, d as reset } from "./chunks/environment.js";
-import { E as ENDPOINT_METHODS, P as PAGE_METHODS, n as negotiate, m as method_not_allowed, h as handle_error_and_jsonify, g as get_status, i as is_form_content_type, a as normalize_error, s as stringify, b as get_global_name, c as serialize_uses, d as clarify_devalue_error, e as get_node_type, f as escape_html, S as SVELTE_KIT_ASSETS, j as create_remote_key, k as static_error_page, r as redirect_response, p as parse_remote_arg, l as stringify$1, o as deserialize_binary_form, q as has_prerendered_path, T as TRAILING_SLASH_PARAM, I as INVALIDATED_PARAM, t as handle_fatal_error, u as format_server_error } from "./chunks/shared.js";
-import { u as uneval } from "./chunks/index.js";
+import { E as ENDPOINT_METHODS, P as PAGE_METHODS, n as negotiate, m as method_not_allowed, h as handle_error_and_jsonify, g as get_status, i as is_form_content_type, a as normalize_error, b as get_global_name, s as serialize_uses, c as clarify_devalue_error, d as get_node_type, e as escape_html, S as SVELTE_KIT_ASSETS, f as create_remote_key, j as static_error_page, r as redirect_response, p as parse_remote_arg, k as stringify, l as deserialize_binary_form, o as has_prerendered_path, T as TRAILING_SLASH_PARAM, I as INVALIDATED_PARAM, q as handle_fatal_error, t as format_server_error } from "./chunks/shared.js";
+import * as devalue from "devalue";
 import { m as make_trackable, d as disable_search, a as decode_params, S as SCHEME, w as writable, r as readable, v as validate_layout_server_exports, b as validate_layout_exports, c as validate_page_server_exports, e as validate_page_exports, n as normalize_path, f as resolve, g as decode_pathname, h as validate_server_exports } from "./chunks/exports.js";
 import { b as base64_encode, t as text_decoder, a as text_encoder, g as get_relative_path } from "./chunks/utils.js";
 import { p as public_env, r as read_implementation, o as options, s as set_private_env, a as set_public_env, g as get_hooks, b as set_read_implementation } from "./chunks/internal.js";
+import { parse, serialize } from "cookie";
+import * as set_cookie_parser from "set-cookie-parser";
 function with_resolvers() {
   let resolve2;
   let reject;
@@ -205,7 +207,7 @@ async function handle_action_json_request(event, event_state, options2, server) 
   check_named_default_separate(actions);
   try {
     const data = await call_action(event, event_state, actions);
-    if (BROWSER) ;
+    if (browser) ;
     if (data instanceof ActionFailure) {
       return action_json({
         type: "failure",
@@ -290,7 +292,7 @@ async function handle_action_request(event, event_state, server) {
   check_named_default_separate(actions);
   try {
     const data = await call_action(event, event_state, actions);
-    if (BROWSER) ;
+    if (browser) ;
     if (data instanceof ActionFailure) {
       return {
         type: "failure",
@@ -386,17 +388,17 @@ function uneval_action_response(data, route_id, transport) {
     for (const key2 in transport) {
       const encoded = transport[key2].encode(thing);
       if (encoded) {
-        return `app.decode('${key2}', ${uneval(encoded, replacer)})`;
+        return `app.decode('${key2}', ${devalue.uneval(encoded, replacer)})`;
       }
     }
   };
-  return try_serialize(data, (value) => uneval(value, replacer), route_id);
+  return try_serialize(data, (value) => devalue.uneval(value, replacer), route_id);
 }
 function stringify_action_response(data, route_id, transport) {
   const encoders = Object.fromEntries(
     Object.entries(transport).map(([key2, value]) => [key2, value.encode])
   );
-  return try_serialize(data, (value) => stringify(value, encoders), route_id);
+  return try_serialize(data, (value) => devalue.stringify(value, encoders), route_id);
 }
 function try_serialize(data, fn, route_id) {
   try {
@@ -470,7 +472,7 @@ function server_data_serializer(event, event_state, options2) {
           async ({ data, error: error2 }) => {
             let str;
             try {
-              str = uneval(error2 ? [, error2] : [data], replacer);
+              str = devalue.uneval(error2 ? [, error2] : [data], replacer);
             } catch {
               error2 = await handle_error_and_jsonify(
                 event,
@@ -479,7 +481,7 @@ function server_data_serializer(event, event_state, options2) {
                 new Error(`Failed to serialize promise while rendering ${event.route.id}`)
               );
               data = void 0;
-              str = uneval([, error2], replacer);
+              str = devalue.uneval([, error2], replacer);
             }
             return {
               index,
@@ -493,7 +495,7 @@ function server_data_serializer(event, event_state, options2) {
         for (const key2 in options2.hooks.transport) {
           const encoded = options2.hooks.transport[key2].encode(thing);
           if (encoded) {
-            return `app.decode('${key2}', ${uneval(encoded, replacer)})`;
+            return `app.decode('${key2}', ${devalue.uneval(encoded, replacer)})`;
           }
         }
       }
@@ -515,7 +517,7 @@ function server_data_serializer(event, event_state, options2) {
         }
         const payload = { type: "data", data: node.data, uses: serialize_uses(node) };
         if (node.slash) payload.slash = node.slash;
-        strings[i] = uneval(payload, get_replacer(i));
+        strings[i] = devalue.uneval(payload, get_replacer(i));
       } catch (e) {
         e.path = e.path.slice(1);
         throw new Error(clarify_devalue_error(
@@ -572,7 +574,7 @@ function server_data_serializer_json(event, event_state, options2) {
         async (value) => {
           let str;
           try {
-            str = stringify(value, reducers);
+            str = devalue.stringify(value, reducers);
           } catch {
             const error2 = await handle_error_and_jsonify(
               event,
@@ -581,7 +583,7 @@ function server_data_serializer_json(event, event_state, options2) {
               new Error(`Failed to serialize promise while rendering ${event.route.id}`)
             );
             key2 = "error";
-            str = stringify(error2, reducers);
+            str = devalue.stringify(error2, reducers);
           }
           return `{"type":"chunk","id":${id},"${key2}":${str}}
 `;
@@ -606,7 +608,7 @@ function server_data_serializer_json(event, event_state, options2) {
           strings[i] = JSON.stringify(node);
           return;
         }
-        strings[i] = `{"type":"data","data":${stringify(node.data, reducers)},"uses":${JSON.stringify(
+        strings[i] = `{"type":"data","data":${devalue.stringify(node.data, reducers)},"uses":${JSON.stringify(
           serialize_uses(node)
         )}${node.slash ? `,"slash":${JSON.stringify(node.slash)}` : ""}}`;
       } catch (e) {
@@ -1590,7 +1592,7 @@ async function render_response({
     };
     const fetch2 = globalThis.fetch;
     try {
-      if (BROWSER) ;
+      if (browser) ;
       rendered = await with_request_store({ event, state: event_state }, async () => {
         if (relative) override({ base: base$1, assets: assets$1 });
         const maybe_promise = options2.root.render(props, render_opts);
@@ -1758,7 +1760,7 @@ async function render_response({
         );
       }
       if (error2) {
-        serialized.error = uneval(error2);
+        serialized.error = devalue.uneval(error2);
       }
       const hydrate = [
         `node_ids: [${branch.map(({ node }) => node.index).join(", ")}]`,
@@ -1775,10 +1777,10 @@ async function render_response({
             "\n",
             "\n							"
           );
-          hydrate.push(`params: ${uneval(event.params)}`, `server_route: ${stringified}`);
+          hydrate.push(`params: ${devalue.uneval(event.params)}`, `server_route: ${stringified}`);
         }
       } else if (options2.embedded) {
-        hydrate.push(`params: ${uneval(event.params)}`, `route: ${s(event.route)}`);
+        hydrate.push(`params: ${devalue.uneval(event.params)}`, `route: ${s(event.route)}`);
       }
       const indent = "	".repeat(load_env_eagerly ? 7 : 6);
       args.push(`{
@@ -1800,11 +1802,11 @@ ${indent}}`);
         for (const key2 in options2.hooks.transport) {
           const encoded = options2.hooks.transport[key2].encode(thing);
           if (encoded) {
-            return `app.decode('${key2}', ${uneval(encoded, replacer)})`;
+            return `app.decode('${key2}', ${devalue.uneval(encoded, replacer)})`;
           }
         }
       };
-      serialized_remote_data = `${global}.data = ${uneval(remote, replacer)};
+      serialized_remote_data = `${global}.data = ${devalue.uneval(remote, replacer)};
 
 						`;
     }
@@ -2205,7 +2207,7 @@ async function handle_remote_call_internal(event, state, options2, manifest, id)
         /** @type {RemoteFunctionResponse} */
         {
           type: "result",
-          result: stringify$1(results, transport)
+          result: stringify(results, transport)
         }
       );
     }
@@ -2236,7 +2238,7 @@ async function handle_remote_call_internal(event, state, options2, manifest, id)
         /** @type {RemoteFunctionResponse} */
         {
           type: "result",
-          result: stringify$1(result, transport),
+          result: stringify(result, transport),
           refreshes: result.issues ? void 0 : await serialize_refreshes(meta.remote_refreshes)
         }
       );
@@ -2249,7 +2251,7 @@ async function handle_remote_call_internal(event, state, options2, manifest, id)
         /** @type {RemoteFunctionResponse} */
         {
           type: "result",
-          result: stringify$1(data2, transport),
+          result: stringify(data2, transport),
           refreshes: await serialize_refreshes(refreshes)
         }
       );
@@ -2267,7 +2269,7 @@ async function handle_remote_call_internal(event, state, options2, manifest, id)
       /** @type {RemoteFunctionResponse} */
       {
         type: "result",
-        result: stringify$1(data, transport)
+        result: stringify(data, transport)
       }
     );
   } catch (error2) {
@@ -2317,7 +2319,7 @@ async function handle_remote_call_internal(event, state, options2, manifest, id)
     if (Object.keys(refreshes).length === 0) {
       return void 0;
     }
-    return stringify$1(
+    return stringify(
       Object.fromEntries(
         await Promise.all(
           Object.entries(refreshes).map(async ([key2, promise]) => [key2, await promise])
@@ -2456,7 +2458,7 @@ async function render_page(event, event_state, page, options2, manifest, state, 
     const ssr = nodes.ssr();
     const csr = nodes.csr();
     if (ssr === false && !(state.prerendering && should_prerender_data)) {
-      if (BROWSER && action_result && !event.request.headers.has("x-sveltekit-action")) ;
+      if (browser && action_result && !event.request.headers.has("x-sveltekit-action")) ;
       return await render_response({
         branch: [],
         fetched,
@@ -2799,152 +2801,6 @@ function redirect_json_response(redirect) {
     }
   );
 }
-var cookie = {};
-var hasRequiredCookie;
-function requireCookie() {
-  if (hasRequiredCookie) return cookie;
-  hasRequiredCookie = 1;
-  cookie.parse = parse;
-  cookie.serialize = serialize;
-  var __toString = Object.prototype.toString;
-  var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
-  function parse(str, options2) {
-    if (typeof str !== "string") {
-      throw new TypeError("argument str must be a string");
-    }
-    var obj = {};
-    var opt = options2 || {};
-    var dec = opt.decode || decode;
-    var index = 0;
-    while (index < str.length) {
-      var eqIdx = str.indexOf("=", index);
-      if (eqIdx === -1) {
-        break;
-      }
-      var endIdx = str.indexOf(";", index);
-      if (endIdx === -1) {
-        endIdx = str.length;
-      } else if (endIdx < eqIdx) {
-        index = str.lastIndexOf(";", eqIdx - 1) + 1;
-        continue;
-      }
-      var key2 = str.slice(index, eqIdx).trim();
-      if (void 0 === obj[key2]) {
-        var val = str.slice(eqIdx + 1, endIdx).trim();
-        if (val.charCodeAt(0) === 34) {
-          val = val.slice(1, -1);
-        }
-        obj[key2] = tryDecode(val, dec);
-      }
-      index = endIdx + 1;
-    }
-    return obj;
-  }
-  function serialize(name, val, options2) {
-    var opt = options2 || {};
-    var enc = opt.encode || encode2;
-    if (typeof enc !== "function") {
-      throw new TypeError("option encode is invalid");
-    }
-    if (!fieldContentRegExp.test(name)) {
-      throw new TypeError("argument name is invalid");
-    }
-    var value = enc(val);
-    if (value && !fieldContentRegExp.test(value)) {
-      throw new TypeError("argument val is invalid");
-    }
-    var str = name + "=" + value;
-    if (null != opt.maxAge) {
-      var maxAge = opt.maxAge - 0;
-      if (isNaN(maxAge) || !isFinite(maxAge)) {
-        throw new TypeError("option maxAge is invalid");
-      }
-      str += "; Max-Age=" + Math.floor(maxAge);
-    }
-    if (opt.domain) {
-      if (!fieldContentRegExp.test(opt.domain)) {
-        throw new TypeError("option domain is invalid");
-      }
-      str += "; Domain=" + opt.domain;
-    }
-    if (opt.path) {
-      if (!fieldContentRegExp.test(opt.path)) {
-        throw new TypeError("option path is invalid");
-      }
-      str += "; Path=" + opt.path;
-    }
-    if (opt.expires) {
-      var expires = opt.expires;
-      if (!isDate(expires) || isNaN(expires.valueOf())) {
-        throw new TypeError("option expires is invalid");
-      }
-      str += "; Expires=" + expires.toUTCString();
-    }
-    if (opt.httpOnly) {
-      str += "; HttpOnly";
-    }
-    if (opt.secure) {
-      str += "; Secure";
-    }
-    if (opt.partitioned) {
-      str += "; Partitioned";
-    }
-    if (opt.priority) {
-      var priority = typeof opt.priority === "string" ? opt.priority.toLowerCase() : opt.priority;
-      switch (priority) {
-        case "low":
-          str += "; Priority=Low";
-          break;
-        case "medium":
-          str += "; Priority=Medium";
-          break;
-        case "high":
-          str += "; Priority=High";
-          break;
-        default:
-          throw new TypeError("option priority is invalid");
-      }
-    }
-    if (opt.sameSite) {
-      var sameSite = typeof opt.sameSite === "string" ? opt.sameSite.toLowerCase() : opt.sameSite;
-      switch (sameSite) {
-        case true:
-          str += "; SameSite=Strict";
-          break;
-        case "lax":
-          str += "; SameSite=Lax";
-          break;
-        case "strict":
-          str += "; SameSite=Strict";
-          break;
-        case "none":
-          str += "; SameSite=None";
-          break;
-        default:
-          throw new TypeError("option sameSite is invalid");
-      }
-    }
-    return str;
-  }
-  function decode(str) {
-    return str.indexOf("%") !== -1 ? decodeURIComponent(str) : str;
-  }
-  function encode2(val) {
-    return encodeURIComponent(val);
-  }
-  function isDate(val) {
-    return __toString.call(val) === "[object Date]" || val instanceof Date;
-  }
-  function tryDecode(str, decode2) {
-    try {
-      return decode2(str);
-    } catch (e) {
-      return str;
-    }
-  }
-  return cookie;
-}
-var cookieExports = requireCookie();
 const INVALID_COOKIE_CHARACTER_REGEX = /[\x00-\x1F\x7F()<>@,;:"/[\]?={} \t]/;
 function validate_options(options2) {
   if (options2?.path === void 0) {
@@ -2956,7 +2812,7 @@ function generate_cookie_key(domain, path, name) {
 }
 function get_cookies(request, url) {
   const header = request.headers.get("cookie") ?? "";
-  const initial_cookies = cookieExports.parse(header, { decode: (value) => value });
+  const initial_cookies = parse(header, { decode: (value) => value });
   let normalized_url;
   const new_cookies = /* @__PURE__ */ new Map();
   const defaults = {
@@ -2980,15 +2836,15 @@ function get_cookies(request, url) {
       if (best_match) {
         return best_match.options.maxAge === 0 ? void 0 : best_match.value;
       }
-      const req_cookies = cookieExports.parse(header, { decode: opts?.decode });
-      const cookie2 = req_cookies[name];
-      return cookie2;
+      const req_cookies = parse(header, { decode: opts?.decode });
+      const cookie = req_cookies[name];
+      return cookie;
     },
     /**
      * @param {import('cookie').CookieParseOptions} [opts]
      */
     getAll(opts) {
-      const cookies2 = cookieExports.parse(header, { decode: opts?.decode });
+      const cookies2 = parse(header, { decode: opts?.decode });
       const lookup = /* @__PURE__ */ new Map();
       for (const c of new_cookies.values()) {
         if (domain_matches(url.hostname, c.options.domain) && path_matches(url.pathname, c.options.path)) {
@@ -3042,7 +2898,7 @@ function get_cookies(request, url) {
         }
         path = resolve(normalized_url, path);
       }
-      return cookieExports.serialize(name, value, { ...defaults, ...options2, path });
+      return serialize(name, value, { ...defaults, ...options2, path });
     }
   };
   function get_cookie_header(destination, header2) {
@@ -3050,14 +2906,14 @@ function get_cookies(request, url) {
       // cookies sent by the user agent have lowest precedence
       ...initial_cookies
     };
-    for (const cookie2 of new_cookies.values()) {
-      if (!domain_matches(destination.hostname, cookie2.options.domain)) continue;
-      if (!path_matches(destination.pathname, cookie2.options.path)) continue;
-      const encoder = cookie2.options.encode || encodeURIComponent;
-      combined_cookies[cookie2.name] = encoder(cookie2.value);
+    for (const cookie of new_cookies.values()) {
+      if (!domain_matches(destination.hostname, cookie.options.domain)) continue;
+      if (!path_matches(destination.pathname, cookie.options.path)) continue;
+      const encoder = cookie.options.encode || encodeURIComponent;
+      combined_cookies[cookie.name] = encoder(cookie.value);
     }
     if (header2) {
-      const parsed = cookieExports.parse(header2, { decode: (value) => value });
+      const parsed = parse(header2, { decode: (value) => value });
       for (const name in parsed) {
         combined_cookies[name] = parsed[name];
       }
@@ -3075,8 +2931,8 @@ function get_cookies(request, url) {
       path = resolve(normalized_url, path);
     }
     const cookie_key = generate_cookie_key(options2.domain, path, name);
-    const cookie2 = { name, value, options: { ...options2, path } };
-    new_cookies.set(cookie_key, cookie2);
+    const cookie = { name, value, options: { ...options2, path } };
+    new_cookies.set(cookie_key, cookie);
   }
   function set_trailing_slash(trailing_slash) {
     normalized_url = normalize_path(url.pathname, trailing_slash);
@@ -3099,200 +2955,13 @@ function path_matches(path, constraint) {
 function add_cookies_to_headers(headers2, cookies) {
   for (const new_cookie of cookies) {
     const { name, value, options: options2 } = new_cookie;
-    headers2.append("set-cookie", cookieExports.serialize(name, value, options2));
+    headers2.append("set-cookie", serialize(name, value, options2));
     if (options2.path.endsWith(".html")) {
       const path = add_data_suffix(options2.path);
-      headers2.append("set-cookie", cookieExports.serialize(name, value, { ...options2, path }));
+      headers2.append("set-cookie", serialize(name, value, { ...options2, path }));
     }
   }
 }
-var defaultParseOptions = {
-  decodeValues: true,
-  map: false,
-  silent: false,
-  split: "auto"
-  // auto = split strings but not arrays
-};
-function isForbiddenKey(key2) {
-  return typeof key2 !== "string" || key2 in {};
-}
-function createNullObj() {
-  return /* @__PURE__ */ Object.create(null);
-}
-function isNonEmptyString(str) {
-  return typeof str === "string" && !!str.trim();
-}
-function parseString(setCookieValue, options2) {
-  var parts = setCookieValue.split(";").filter(isNonEmptyString);
-  var nameValuePairStr = parts.shift();
-  var parsed = parseNameValuePair(nameValuePairStr);
-  var name = parsed.name;
-  var value = parsed.value;
-  options2 = options2 ? Object.assign({}, defaultParseOptions, options2) : defaultParseOptions;
-  if (isForbiddenKey(name)) {
-    return null;
-  }
-  try {
-    value = options2.decodeValues ? decodeURIComponent(value) : value;
-  } catch (e) {
-    console.error(
-      "set-cookie-parser: failed to decode cookie value. Set options.decodeValues=false to disable decoding.",
-      e
-    );
-  }
-  var cookie2 = createNullObj();
-  cookie2.name = name;
-  cookie2.value = value;
-  parts.forEach(function(part) {
-    var sides = part.split("=");
-    var key2 = sides.shift().trimLeft().toLowerCase();
-    if (isForbiddenKey(key2)) {
-      return;
-    }
-    var value2 = sides.join("=");
-    if (key2 === "expires") {
-      cookie2.expires = new Date(value2);
-    } else if (key2 === "max-age") {
-      var n = parseInt(value2, 10);
-      if (!Number.isNaN(n)) cookie2.maxAge = n;
-    } else if (key2 === "secure") {
-      cookie2.secure = true;
-    } else if (key2 === "httponly") {
-      cookie2.httpOnly = true;
-    } else if (key2 === "samesite") {
-      cookie2.sameSite = value2;
-    } else if (key2 === "partitioned") {
-      cookie2.partitioned = true;
-    } else if (key2) {
-      cookie2[key2] = value2;
-    }
-  });
-  return cookie2;
-}
-function parseNameValuePair(nameValuePairStr) {
-  var name = "";
-  var value = "";
-  var nameValueArr = nameValuePairStr.split("=");
-  if (nameValueArr.length > 1) {
-    name = nameValueArr.shift();
-    value = nameValueArr.join("=");
-  } else {
-    value = nameValuePairStr;
-  }
-  return { name, value };
-}
-function parseSetCookie(input, options2) {
-  options2 = options2 ? Object.assign({}, defaultParseOptions, options2) : defaultParseOptions;
-  if (!input) {
-    if (!options2.map) {
-      return [];
-    } else {
-      return createNullObj();
-    }
-  }
-  if (input.headers) {
-    if (typeof input.headers.getSetCookie === "function") {
-      input = input.headers.getSetCookie();
-    } else if (input.headers["set-cookie"]) {
-      input = input.headers["set-cookie"];
-    } else {
-      var sch = input.headers[Object.keys(input.headers).find(function(key2) {
-        return key2.toLowerCase() === "set-cookie";
-      })];
-      if (!sch && input.headers.cookie && !options2.silent) {
-        console.warn(
-          "Warning: set-cookie-parser appears to have been called on a request object. It is designed to parse Set-Cookie headers from responses, not Cookie headers from requests. Set the option {silent: true} to suppress this warning."
-        );
-      }
-      input = sch;
-    }
-  }
-  var split = options2.split;
-  var isArray = Array.isArray(input);
-  if (split === "auto") {
-    split = !isArray;
-  }
-  if (!isArray) {
-    input = [input];
-  }
-  input = input.filter(isNonEmptyString);
-  if (split) {
-    input = input.map(splitCookiesString).flat();
-  }
-  if (!options2.map) {
-    return input.map(function(str) {
-      return parseString(str, options2);
-    }).filter(Boolean);
-  } else {
-    var cookies = createNullObj();
-    return input.reduce(function(cookies2, str) {
-      var cookie2 = parseString(str, options2);
-      if (cookie2 && !isForbiddenKey(cookie2.name)) {
-        cookies2[cookie2.name] = cookie2;
-      }
-      return cookies2;
-    }, cookies);
-  }
-}
-function splitCookiesString(cookiesString) {
-  if (Array.isArray(cookiesString)) {
-    return cookiesString;
-  }
-  if (typeof cookiesString !== "string") {
-    return [];
-  }
-  var cookiesStrings = [];
-  var pos = 0;
-  var start;
-  var ch;
-  var lastComma;
-  var nextStart;
-  var cookiesSeparatorFound;
-  function skipWhitespace() {
-    while (pos < cookiesString.length && /\s/.test(cookiesString.charAt(pos))) {
-      pos += 1;
-    }
-    return pos < cookiesString.length;
-  }
-  function notSpecialChar() {
-    ch = cookiesString.charAt(pos);
-    return ch !== "=" && ch !== ";" && ch !== ",";
-  }
-  while (pos < cookiesString.length) {
-    start = pos;
-    cookiesSeparatorFound = false;
-    while (skipWhitespace()) {
-      ch = cookiesString.charAt(pos);
-      if (ch === ",") {
-        lastComma = pos;
-        pos += 1;
-        skipWhitespace();
-        nextStart = pos;
-        while (pos < cookiesString.length && notSpecialChar()) {
-          pos += 1;
-        }
-        if (pos < cookiesString.length && cookiesString.charAt(pos) === "=") {
-          cookiesSeparatorFound = true;
-          pos = nextStart;
-          cookiesStrings.push(cookiesString.substring(start, lastComma));
-          start = pos;
-        } else {
-          pos = lastComma + 1;
-        }
-      } else {
-        pos += 1;
-      }
-    }
-    if (!cookiesSeparatorFound || pos >= cookiesString.length) {
-      cookiesStrings.push(cookiesString.substring(start, cookiesString.length));
-    }
-  }
-  return cookiesStrings;
-}
-parseSetCookie.parseSetCookie = parseSetCookie;
-parseSetCookie.parse = parseSetCookie;
-parseSetCookie.parseString = parseString;
-parseSetCookie.splitCookiesString = splitCookiesString;
 function create_fetch({ event, options: options2, manifest, state, get_cookie_header, set_internal }) {
   const server_fetch = async (info, init2) => {
     const original_request = normalize_fetch_input(info, init2, event.url);
@@ -3317,8 +2986,8 @@ function create_fetch({ event, options: options2, manifest, state, get_cookie_he
         const decoded = decodeURIComponent(url.pathname);
         if (url.origin !== event.url.origin || base && decoded !== base && !decoded.startsWith(`${base}/`)) {
           if (`.${url.hostname}`.endsWith(`.${event.url.hostname}`) && credentials !== "omit") {
-            const cookie2 = get_cookie_header(url, request.headers.get("cookie"));
-            if (cookie2) request.headers.set("cookie", cookie2);
+            const cookie = get_cookie_header(url, request.headers.get("cookie"));
+            if (cookie) request.headers.set("cookie", cookie);
           }
           return fetch(request);
         }
@@ -3350,9 +3019,9 @@ function create_fetch({ event, options: options2, manifest, state, get_cookie_he
           return await fetch(request);
         }
         if (credentials !== "omit") {
-          const cookie2 = get_cookie_header(url, request.headers.get("cookie"));
-          if (cookie2) {
-            request.headers.set("cookie", cookie2);
+          const cookie = get_cookie_header(url, request.headers.get("cookie"));
+          if (cookie) {
+            request.headers.set("cookie", cookie);
           }
           const authorization = event.request.headers.get("authorization");
           if (authorization && !request.headers.has("authorization")) {
@@ -3372,8 +3041,8 @@ function create_fetch({ event, options: options2, manifest, state, get_cookie_he
         const response = await internal_fetch(request, options2, manifest, state);
         const set_cookie = response.headers.get("set-cookie");
         if (set_cookie) {
-          for (const str of splitCookiesString(set_cookie)) {
-            const { name, value, ...options3 } = parseString(str, {
+          for (const str of set_cookie_parser.splitCookiesString(set_cookie)) {
+            const { name, value, ...options3 } = set_cookie_parser.parseString(str, {
               decodeValues: false
             });
             const path = options3.path ?? (url.pathname.split("/").slice(0, -1).join("/") || "/");
@@ -3643,12 +3312,12 @@ async function internal_respond(request, options2, manifest, state) {
       if (url.pathname === base || url.pathname === base + "/") {
         trailing_slash = "always";
       } else if (page_nodes) {
-        if (BROWSER) ;
+        if (browser) ;
         trailing_slash = page_nodes.trailing_slash();
       } else if (route.endpoint) {
         const node = await route.endpoint();
         trailing_slash = node.trailingSlash ?? "never";
-        if (BROWSER) ;
+        if (browser) ;
       }
       if (!is_data_request) {
         const normalized = normalize_path(url.pathname, trailing_slash);
@@ -3908,7 +3577,7 @@ async function internal_respond(request, options2, manifest, state) {
         });
       }
       if (state.depth === 0) {
-        if (BROWSER && event2.url.pathname === "/.well-known/appspecific/com.chrome.devtools.json") ;
+        if (browser && event2.url.pathname === "/.well-known/appspecific/com.chrome.devtools.json") ;
         return await respond_with_error({
           event: event2,
           event_state,

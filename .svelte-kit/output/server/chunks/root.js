@@ -1,5 +1,6 @@
-import { H as HYDRATION_ERROR, C as COMMENT_NODE, c as HYDRATION_END, d as HYDRATION_START, f as HYDRATION_START_ELSE, r as run_all, B as BOUNDARY_EFFECT, R as REACTION_RAN, E as ERROR_VALUE, h as EFFECT, i as CONNECTED, j as CLEAN, M as MAYBE_DIRTY, D as DIRTY, k as DERIVED, W as WAS_MARKED, I as INERT, l as BLOCK_EFFECT, U as UNINITIALIZED, m as deferred, o as BRANCH_EFFECT, p as ROOT_EFFECT, q as RENDER_EFFECT, s as MANAGED_EFFECT, t as HEAD_EFFECT, v as DESTROYED, A as ASYNC, w as includes, x as EFFECT_TRANSPARENT, y as EFFECT_PRESERVED, S as STALE_REACTION, n as noop, z as EAGER_EFFECT, F as STATE_SYMBOL, G as object_prototype, J as array_prototype, K as get_descriptor, L as get_prototype_of, N as is_array, O as is_extensible, P as USER_EFFECT, Q as REACTION_IS_UPDATING, T as index_of, V as define_property, X as array_from, Y as is_passive_event, Z as LEGACY_PROPS, _ as render, $ as setContext } from "./index.js";
-import { B as BROWSER } from "./false.js";
+import { H as HYDRATION_ERROR, C as COMMENT_NODE, i as HYDRATION_END, j as HYDRATION_START, k as HYDRATION_START_ELSE, r as run_all, B as BOUNDARY_EFFECT, R as REACTION_RAN, E as ERROR_VALUE, l as EFFECT, m as CONNECTED, o as CLEAN, M as MAYBE_DIRTY, D as DIRTY, p as DERIVED, W as WAS_MARKED, I as INERT, q as BLOCK_EFFECT, U as UNINITIALIZED, t as deferred, u as BRANCH_EFFECT, v as ROOT_EFFECT, w as RENDER_EFFECT, x as MANAGED_EFFECT, y as HEAD_EFFECT, z as DESTROYED, A as ASYNC, F as includes, G as EFFECT_TRANSPARENT, J as EFFECT_PRESERVED, S as STALE_REACTION, n as noop, K as EAGER_EFFECT, L as STATE_SYMBOL, N as object_prototype, O as array_prototype, P as get_descriptor, Q as get_prototype_of, T as is_array, V as is_extensible, X as USER_EFFECT, Y as REACTION_IS_UPDATING, Z as index_of, _ as define_property, $ as array_from, a0 as is_passive_event, a1 as LEGACY_PROPS, a2 as render, a3 as setContext } from "./index.js";
+import { b as browser } from "./false.js";
+import "clsx";
 function equals(value) {
   return value === this.v;
 }
@@ -590,12 +591,12 @@ function flush_effects() {
       var batch = Batch.ensure();
       if (flush_count++ > 1e3) {
         var updates, entry;
-        if (BROWSER) ;
+        if (browser) ;
         infinite_loop_guard();
       }
       batch.process(queued_root_effects);
       old_values.clear();
-      if (BROWSER) ;
+      if (browser) ;
     }
   } finally {
     queued_root_effects = [];
@@ -2062,7 +2063,7 @@ function update_effect(effect) {
     effect.teardown = typeof teardown === "function" ? teardown : null;
     effect.wv = write_version;
     var dep;
-    if (BROWSER && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
+    if (browser && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
   } finally {
     is_updating_effect = was_updating_effect;
     active_effect = previous_effect;

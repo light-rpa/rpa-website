@@ -1,427 +1,11 @@
 import { json, text } from "@sveltejs/kit";
 import { SvelteKitError, HttpError } from "@sveltejs/kit/internal";
 import { with_request_store } from "@sveltejs/kit/internal/server";
+import * as devalue from "devalue";
 import { t as text_decoder, b as base64_encode, c as base64_decode } from "./utils.js";
-import { D as DevalueError, i as is_primitive, g as get_type, a as is_plain_object, e as enumerable_symbols, s as stringify_key, b as stringify_string } from "./utils2.js";
 const SVELTE_KIT_ASSETS = "/_svelte_kit_assets";
 const ENDPOINT_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"];
 const PAGE_METHODS = ["GET", "POST", "HEAD"];
-function encode64(arraybuffer) {
-  const dv = new DataView(arraybuffer);
-  let binaryString = "";
-  for (let i = 0; i < arraybuffer.byteLength; i++) {
-    binaryString += String.fromCharCode(dv.getUint8(i));
-  }
-  return binaryToAscii(binaryString);
-}
-function decode64(string) {
-  const binaryString = asciiToBinary(string);
-  const arraybuffer = new ArrayBuffer(binaryString.length);
-  const dv = new DataView(arraybuffer);
-  for (let i = 0; i < arraybuffer.byteLength; i++) {
-    dv.setUint8(i, binaryString.charCodeAt(i));
-  }
-  return arraybuffer;
-}
-const KEY_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-function asciiToBinary(data) {
-  if (data.length % 4 === 0) {
-    data = data.replace(/==?$/, "");
-  }
-  let output = "";
-  let buffer = 0;
-  let accumulatedBits = 0;
-  for (let i = 0; i < data.length; i++) {
-    buffer <<= 6;
-    buffer |= KEY_STRING.indexOf(data[i]);
-    accumulatedBits += 6;
-    if (accumulatedBits === 24) {
-      output += String.fromCharCode((buffer & 16711680) >> 16);
-      output += String.fromCharCode((buffer & 65280) >> 8);
-      output += String.fromCharCode(buffer & 255);
-      buffer = accumulatedBits = 0;
-    }
-  }
-  if (accumulatedBits === 12) {
-    buffer >>= 4;
-    output += String.fromCharCode(buffer);
-  } else if (accumulatedBits === 18) {
-    buffer >>= 2;
-    output += String.fromCharCode((buffer & 65280) >> 8);
-    output += String.fromCharCode(buffer & 255);
-  }
-  return output;
-}
-function binaryToAscii(str) {
-  let out = "";
-  for (let i = 0; i < str.length; i += 3) {
-    const groupsOfSix = [void 0, void 0, void 0, void 0];
-    groupsOfSix[0] = str.charCodeAt(i) >> 2;
-    groupsOfSix[1] = (str.charCodeAt(i) & 3) << 4;
-    if (str.length > i + 1) {
-      groupsOfSix[1] |= str.charCodeAt(i + 1) >> 4;
-      groupsOfSix[2] = (str.charCodeAt(i + 1) & 15) << 2;
-    }
-    if (str.length > i + 2) {
-      groupsOfSix[2] |= str.charCodeAt(i + 2) >> 6;
-      groupsOfSix[3] = str.charCodeAt(i + 2) & 63;
-    }
-    for (let j = 0; j < groupsOfSix.length; j++) {
-      if (typeof groupsOfSix[j] === "undefined") {
-        out += "=";
-      } else {
-        out += KEY_STRING[groupsOfSix[j]];
-      }
-    }
-  }
-  return out;
-}
-const UNDEFINED = -1;
-const HOLE = -2;
-const NAN = -3;
-const POSITIVE_INFINITY = -4;
-const NEGATIVE_INFINITY = -5;
-const NEGATIVE_ZERO = -6;
-function parse(serialized, revivers) {
-  return unflatten(JSON.parse(serialized), revivers);
-}
-function unflatten(parsed, revivers) {
-  if (typeof parsed === "number") return hydrate(parsed, true);
-  if (!Array.isArray(parsed) || parsed.length === 0) {
-    throw new Error("Invalid input");
-  }
-  const values = (
-    /** @type {any[]} */
-    parsed
-  );
-  const hydrated = Array(values.length);
-  let hydrating = null;
-  function hydrate(index, standalone = false) {
-    if (index === UNDEFINED) return void 0;
-    if (index === NAN) return NaN;
-    if (index === POSITIVE_INFINITY) return Infinity;
-    if (index === NEGATIVE_INFINITY) return -Infinity;
-    if (index === NEGATIVE_ZERO) return -0;
-    if (standalone || typeof index !== "number") {
-      throw new Error(`Invalid input`);
-    }
-    if (index in hydrated) return hydrated[index];
-    const value = values[index];
-    if (!value || typeof value !== "object") {
-      hydrated[index] = value;
-    } else if (Array.isArray(value)) {
-      if (typeof value[0] === "string") {
-        const type = value[0];
-        const reviver = revivers && Object.hasOwn(revivers, type) ? revivers[type] : void 0;
-        if (reviver) {
-          let i = value[1];
-          if (typeof i !== "number") {
-            i = values.push(value[1]) - 1;
-          }
-          hydrating ??= /* @__PURE__ */ new Set();
-          if (hydrating.has(i)) {
-            throw new Error("Invalid circular reference");
-          }
-          hydrating.add(i);
-          hydrated[index] = reviver(hydrate(i));
-          hydrating.delete(i);
-          return hydrated[index];
-        }
-        switch (type) {
-          case "Date":
-            hydrated[index] = new Date(value[1]);
-            break;
-          case "Set":
-            const set = /* @__PURE__ */ new Set();
-            hydrated[index] = set;
-            for (let i = 1; i < value.length; i += 1) {
-              set.add(hydrate(value[i]));
-            }
-            break;
-          case "Map":
-            const map = /* @__PURE__ */ new Map();
-            hydrated[index] = map;
-            for (let i = 1; i < value.length; i += 2) {
-              map.set(hydrate(value[i]), hydrate(value[i + 1]));
-            }
-            break;
-          case "RegExp":
-            hydrated[index] = new RegExp(value[1], value[2]);
-            break;
-          case "Object":
-            hydrated[index] = Object(value[1]);
-            break;
-          case "BigInt":
-            hydrated[index] = BigInt(value[1]);
-            break;
-          case "null":
-            const obj = /* @__PURE__ */ Object.create(null);
-            hydrated[index] = obj;
-            for (let i = 1; i < value.length; i += 2) {
-              obj[value[i]] = hydrate(value[i + 1]);
-            }
-            break;
-          case "Int8Array":
-          case "Uint8Array":
-          case "Uint8ClampedArray":
-          case "Int16Array":
-          case "Uint16Array":
-          case "Int32Array":
-          case "Uint32Array":
-          case "Float32Array":
-          case "Float64Array":
-          case "BigInt64Array":
-          case "BigUint64Array": {
-            if (values[value[1]][0] !== "ArrayBuffer") {
-              throw new Error("Invalid data");
-            }
-            const TypedArrayConstructor = globalThis[type];
-            const buffer = hydrate(value[1]);
-            const typedArray = new TypedArrayConstructor(buffer);
-            hydrated[index] = value[2] !== void 0 ? typedArray.subarray(value[2], value[3]) : typedArray;
-            break;
-          }
-          case "ArrayBuffer": {
-            const base64 = value[1];
-            if (typeof base64 !== "string") {
-              throw new Error("Invalid ArrayBuffer encoding");
-            }
-            const arraybuffer = decode64(base64);
-            hydrated[index] = arraybuffer;
-            break;
-          }
-          case "Temporal.Duration":
-          case "Temporal.Instant":
-          case "Temporal.PlainDate":
-          case "Temporal.PlainTime":
-          case "Temporal.PlainDateTime":
-          case "Temporal.PlainMonthDay":
-          case "Temporal.PlainYearMonth":
-          case "Temporal.ZonedDateTime": {
-            const temporalName = type.slice(9);
-            hydrated[index] = Temporal[temporalName].from(value[1]);
-            break;
-          }
-          case "URL": {
-            const url = new URL(value[1]);
-            hydrated[index] = url;
-            break;
-          }
-          case "URLSearchParams": {
-            const url = new URLSearchParams(value[1]);
-            hydrated[index] = url;
-            break;
-          }
-          default:
-            throw new Error(`Unknown type ${type}`);
-        }
-      } else {
-        const array = new Array(value.length);
-        hydrated[index] = array;
-        for (let i = 0; i < value.length; i += 1) {
-          const n = value[i];
-          if (n === HOLE) continue;
-          array[i] = hydrate(n);
-        }
-      }
-    } else {
-      const object = {};
-      hydrated[index] = object;
-      for (const key in value) {
-        if (key === "__proto__") {
-          throw new Error("Cannot parse an object with a `__proto__` property");
-        }
-        const n = value[key];
-        object[key] = hydrate(n);
-      }
-    }
-    return hydrated[index];
-  }
-  return hydrate(0);
-}
-function stringify$1(value, reducers) {
-  const stringified = [];
-  const indexes = /* @__PURE__ */ new Map();
-  const custom = [];
-  if (reducers) {
-    for (const key of Object.getOwnPropertyNames(reducers)) {
-      custom.push({ key, fn: reducers[key] });
-    }
-  }
-  const keys = [];
-  let p = 0;
-  function flatten(thing) {
-    if (thing === void 0) return UNDEFINED;
-    if (Number.isNaN(thing)) return NAN;
-    if (thing === Infinity) return POSITIVE_INFINITY;
-    if (thing === -Infinity) return NEGATIVE_INFINITY;
-    if (thing === 0 && 1 / thing < 0) return NEGATIVE_ZERO;
-    if (indexes.has(thing)) return indexes.get(thing);
-    const index2 = p++;
-    indexes.set(thing, index2);
-    for (const { key, fn } of custom) {
-      const value2 = fn(thing);
-      if (value2) {
-        stringified[index2] = `["${key}",${flatten(value2)}]`;
-        return index2;
-      }
-    }
-    if (typeof thing === "function") {
-      throw new DevalueError(`Cannot stringify a function`, keys, thing, value);
-    }
-    let str = "";
-    if (is_primitive(thing)) {
-      str = stringify_primitive(thing);
-    } else {
-      const type = get_type(thing);
-      switch (type) {
-        case "Number":
-        case "String":
-        case "Boolean":
-          str = `["Object",${stringify_primitive(thing)}]`;
-          break;
-        case "BigInt":
-          str = `["BigInt",${thing}]`;
-          break;
-        case "Date":
-          const valid = !isNaN(thing.getDate());
-          str = `["Date","${valid ? thing.toISOString() : ""}"]`;
-          break;
-        case "URL":
-          str = `["URL",${stringify_string(thing.toString())}]`;
-          break;
-        case "URLSearchParams":
-          str = `["URLSearchParams",${stringify_string(thing.toString())}]`;
-          break;
-        case "RegExp":
-          const { source, flags } = thing;
-          str = flags ? `["RegExp",${stringify_string(source)},"${flags}"]` : `["RegExp",${stringify_string(source)}]`;
-          break;
-        case "Array":
-          str = "[";
-          for (let i = 0; i < thing.length; i += 1) {
-            if (i > 0) str += ",";
-            if (i in thing) {
-              keys.push(`[${i}]`);
-              str += flatten(thing[i]);
-              keys.pop();
-            } else {
-              str += HOLE;
-            }
-          }
-          str += "]";
-          break;
-        case "Set":
-          str = '["Set"';
-          for (const value2 of thing) {
-            str += `,${flatten(value2)}`;
-          }
-          str += "]";
-          break;
-        case "Map":
-          str = '["Map"';
-          for (const [key, value2] of thing) {
-            keys.push(
-              `.get(${is_primitive(key) ? stringify_primitive(key) : "..."})`
-            );
-            str += `,${flatten(key)},${flatten(value2)}`;
-            keys.pop();
-          }
-          str += "]";
-          break;
-        case "Int8Array":
-        case "Uint8Array":
-        case "Uint8ClampedArray":
-        case "Int16Array":
-        case "Uint16Array":
-        case "Int32Array":
-        case "Uint32Array":
-        case "Float32Array":
-        case "Float64Array":
-        case "BigInt64Array":
-        case "BigUint64Array": {
-          const typedArray = thing;
-          str = '["' + type + '",' + flatten(typedArray.buffer);
-          const a = thing.byteOffset;
-          const b = a + thing.byteLength;
-          if (a > 0 || b !== typedArray.buffer.byteLength) {
-            const m = +/(\d+)/.exec(type)[1] / 8;
-            str += `,${a / m},${b / m}`;
-          }
-          str += "]";
-          break;
-        }
-        case "ArrayBuffer": {
-          const arraybuffer = thing;
-          const base64 = encode64(arraybuffer);
-          str = `["ArrayBuffer","${base64}"]`;
-          break;
-        }
-        case "Temporal.Duration":
-        case "Temporal.Instant":
-        case "Temporal.PlainDate":
-        case "Temporal.PlainTime":
-        case "Temporal.PlainDateTime":
-        case "Temporal.PlainMonthDay":
-        case "Temporal.PlainYearMonth":
-        case "Temporal.ZonedDateTime":
-          str = `["${type}",${stringify_string(thing.toString())}]`;
-          break;
-        default:
-          if (!is_plain_object(thing)) {
-            throw new DevalueError(
-              `Cannot stringify arbitrary non-POJOs`,
-              keys,
-              thing,
-              value
-            );
-          }
-          if (enumerable_symbols(thing).length > 0) {
-            throw new DevalueError(
-              `Cannot stringify POJOs with symbolic keys`,
-              keys,
-              thing,
-              value
-            );
-          }
-          if (Object.getPrototypeOf(thing) === null) {
-            str = '["null"';
-            for (const key in thing) {
-              keys.push(stringify_key(key));
-              str += `,${stringify_string(key)},${flatten(thing[key])}`;
-              keys.pop();
-            }
-            str += "]";
-          } else {
-            str = "{";
-            let started = false;
-            for (const key in thing) {
-              if (started) str += ",";
-              started = true;
-              keys.push(stringify_key(key));
-              str += `${stringify_string(key)}:${flatten(thing[key])}`;
-              keys.pop();
-            }
-            str += "}";
-          }
-      }
-    }
-    stringified[index2] = str;
-    return index2;
-  }
-  const index = flatten(value);
-  if (index < 0) return `${index}`;
-  return `[${stringified.join(",")}]`;
-}
-function stringify_primitive(thing) {
-  const type = typeof thing;
-  if (type === "string") return stringify_string(thing);
-  if (thing instanceof String) return stringify_string(thing.toString());
-  if (thing === void 0) return UNDEFINED.toString();
-  if (thing === 0 && 1 / thing < 0) return NEGATIVE_ZERO.toString();
-  if (type === "bigint") return `["BigInt","${thing}"]`;
-  return String(thing);
-}
 function set_nested_value(object, path_string, value) {
   if (path_string.startsWith("n:")) {
     path_string = path_string.slice(2);
@@ -546,7 +130,7 @@ async function deserialize_binary_form(request) {
     JSON.parse(text_decoder.decode(file_offsets_buffer));
     files_start_offset = HEADER_BYTES + data_length + file_offsets_length;
   }
-  const [data, meta] = parse(text_decoder.decode(data_buffer), {
+  const [data, meta] = devalue.parse(text_decoder.decode(data_buffer), {
     File: ([name, type, size, last_modified, index]) => {
       if (files_start_offset + file_offsets[index] + size > content_length) {
         throw deserialize_error("file data overflow");
@@ -1131,7 +715,7 @@ const INVALIDATED_PARAM = "x-sveltekit-invalidated";
 const TRAILING_SLASH_PARAM = "x-sveltekit-trailing-slash";
 function stringify(data, transport) {
   const encoders = Object.fromEntries(Object.entries(transport).map(([k, v]) => [k, v.encode]));
-  return stringify$1(data, encoders);
+  return devalue.stringify(data, encoders);
 }
 function stringify_remote_arg(value, transport) {
   if (value === void 0) return "";
@@ -1146,14 +730,12 @@ function parse_remote_arg(string, transport) {
     base64_decode(string.replaceAll("-", "+").replaceAll("_", "/"))
   );
   const decoders = Object.fromEntries(Object.entries(transport).map(([k, v]) => [k, v.decode]));
-  return parse(json_string, decoders);
+  return devalue.parse(json_string, decoders);
 }
 function create_remote_key(id, payload) {
   return id + "/" + payload;
 }
 export {
-  set_nested_value as A,
-  deep_set as B,
   ENDPOINT_METHODS as E,
   INVALIDATED_PARAM as I,
   PAGE_METHODS as P,
@@ -1161,28 +743,28 @@ export {
   TRAILING_SLASH_PARAM as T,
   normalize_error as a,
   get_global_name as b,
-  serialize_uses as c,
-  clarify_devalue_error as d,
-  get_node_type as e,
-  escape_html as f,
+  clarify_devalue_error as c,
+  get_node_type as d,
+  escape_html as e,
+  create_remote_key as f,
   get_status as g,
   handle_error_and_jsonify as h,
   is_form_content_type as i,
-  create_remote_key as j,
-  static_error_page as k,
-  stringify as l,
+  static_error_page as j,
+  stringify as k,
+  deserialize_binary_form as l,
   method_not_allowed as m,
   negotiate as n,
-  deserialize_binary_form as o,
+  has_prerendered_path as o,
   parse_remote_arg as p,
-  has_prerendered_path as q,
+  handle_fatal_error as q,
   redirect_response as r,
-  stringify$1 as s,
-  handle_fatal_error as t,
-  format_server_error as u,
-  stringify_remote_arg as v,
-  parse as w,
-  flatten_issues as x,
-  create_field_proxy as y,
-  normalize_issue as z
+  serialize_uses as s,
+  format_server_error as t,
+  stringify_remote_arg as u,
+  flatten_issues as v,
+  create_field_proxy as w,
+  normalize_issue as x,
+  set_nested_value as y,
+  deep_set as z
 };

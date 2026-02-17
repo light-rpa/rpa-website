@@ -75,7 +75,6 @@ declare module '$env/static/private' {
 	export const npm_lifecycle_script: string;
 	export const npm_package_version: string;
 	export const npm_lifecycle_event: string;
-	export const NODE_PATH: string;
 	export const RAILWAY_ENVIRONMENT: string;
 	export const RAILWAY_ENVIRONMENT_ID: string;
 	export const RAILWAY_VOLUME_NAME: string;
@@ -175,7 +174,6 @@ declare module '$env/dynamic/private' {
 		npm_lifecycle_script: string;
 		npm_package_version: string;
 		npm_lifecycle_event: string;
-		NODE_PATH: string;
 		RAILWAY_ENVIRONMENT: string;
 		RAILWAY_ENVIRONMENT_ID: string;
 		RAILWAY_VOLUME_NAME: string;

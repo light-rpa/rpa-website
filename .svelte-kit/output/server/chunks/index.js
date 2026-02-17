@@ -1,299 +1,5 @@
-import { i as is_primitive, g as get_type, D as DevalueError, a as is_plain_object, e as enumerable_symbols, s as stringify_key, b as stringify_string, c as escaped } from "./utils2.js";
-const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$";
-const unsafe_chars = /[<\b\f\n\r\t\0\u2028\u2029]/g;
-const reserved = /^(?:do|if|in|for|int|let|new|try|var|byte|case|char|else|enum|goto|long|this|void|with|await|break|catch|class|const|final|float|short|super|throw|while|yield|delete|double|export|import|native|return|switch|throws|typeof|boolean|default|extends|finally|package|private|abstract|continue|debugger|function|volatile|interface|protected|transient|implements|instanceof|synchronized)$/;
-function uneval(value, replacer) {
-  const counts = /* @__PURE__ */ new Map();
-  const keys = [];
-  const custom = /* @__PURE__ */ new Map();
-  function walk(thing) {
-    if (!is_primitive(thing)) {
-      if (counts.has(thing)) {
-        counts.set(thing, counts.get(thing) + 1);
-        return;
-      }
-      counts.set(thing, 1);
-      if (replacer) {
-        const str2 = replacer(thing, (value2) => uneval(value2, replacer));
-        if (typeof str2 === "string") {
-          custom.set(thing, str2);
-          return;
-        }
-      }
-      if (typeof thing === "function") {
-        throw new DevalueError(`Cannot stringify a function`, keys, thing, value);
-      }
-      const type = get_type(thing);
-      switch (type) {
-        case "Number":
-        case "BigInt":
-        case "String":
-        case "Boolean":
-        case "Date":
-        case "RegExp":
-        case "URL":
-        case "URLSearchParams":
-          return;
-        case "Array":
-          thing.forEach((value2, i) => {
-            keys.push(`[${i}]`);
-            walk(value2);
-            keys.pop();
-          });
-          break;
-        case "Set":
-          Array.from(thing).forEach(walk);
-          break;
-        case "Map":
-          for (const [key, value2] of thing) {
-            keys.push(
-              `.get(${is_primitive(key) ? stringify_primitive(key) : "..."})`
-            );
-            walk(value2);
-            keys.pop();
-          }
-          break;
-        case "Int8Array":
-        case "Uint8Array":
-        case "Uint8ClampedArray":
-        case "Int16Array":
-        case "Uint16Array":
-        case "Int32Array":
-        case "Uint32Array":
-        case "Float32Array":
-        case "Float64Array":
-        case "BigInt64Array":
-        case "BigUint64Array":
-          walk(thing.buffer);
-          return;
-        case "ArrayBuffer":
-          return;
-        case "Temporal.Duration":
-        case "Temporal.Instant":
-        case "Temporal.PlainDate":
-        case "Temporal.PlainTime":
-        case "Temporal.PlainDateTime":
-        case "Temporal.PlainMonthDay":
-        case "Temporal.PlainYearMonth":
-        case "Temporal.ZonedDateTime":
-          return;
-        default:
-          if (!is_plain_object(thing)) {
-            throw new DevalueError(
-              `Cannot stringify arbitrary non-POJOs`,
-              keys,
-              thing,
-              value
-            );
-          }
-          if (enumerable_symbols(thing).length > 0) {
-            throw new DevalueError(
-              `Cannot stringify POJOs with symbolic keys`,
-              keys,
-              thing,
-              value
-            );
-          }
-          for (const key in thing) {
-            keys.push(stringify_key(key));
-            walk(thing[key]);
-            keys.pop();
-          }
-      }
-    }
-  }
-  walk(value);
-  const names = /* @__PURE__ */ new Map();
-  Array.from(counts).filter((entry) => entry[1] > 1).sort((a, b) => b[1] - a[1]).forEach((entry, i) => {
-    names.set(entry[0], get_name(i));
-  });
-  function stringify(thing) {
-    if (names.has(thing)) {
-      return names.get(thing);
-    }
-    if (is_primitive(thing)) {
-      return stringify_primitive(thing);
-    }
-    if (custom.has(thing)) {
-      return custom.get(thing);
-    }
-    const type = get_type(thing);
-    switch (type) {
-      case "Number":
-      case "String":
-      case "Boolean":
-        return `Object(${stringify(thing.valueOf())})`;
-      case "RegExp":
-        return `new RegExp(${stringify_string(thing.source)}, "${thing.flags}")`;
-      case "Date":
-        return `new Date(${thing.getTime()})`;
-      case "URL":
-        return `new URL(${stringify_string(thing.toString())})`;
-      case "URLSearchParams":
-        return `new URLSearchParams(${stringify_string(thing.toString())})`;
-      case "Array":
-        const members = (
-          /** @type {any[]} */
-          thing.map(
-            (v, i) => i in thing ? stringify(v) : ""
-          )
-        );
-        const tail = thing.length === 0 || thing.length - 1 in thing ? "" : ",";
-        return `[${members.join(",")}${tail}]`;
-      case "Set":
-      case "Map":
-        return `new ${type}([${Array.from(thing).map(stringify).join(",")}])`;
-      case "Int8Array":
-      case "Uint8Array":
-      case "Uint8ClampedArray":
-      case "Int16Array":
-      case "Uint16Array":
-      case "Int32Array":
-      case "Uint32Array":
-      case "Float32Array":
-      case "Float64Array":
-      case "BigInt64Array":
-      case "BigUint64Array": {
-        let str2 = `new ${type}`;
-        if (counts.get(thing.buffer) === 1) {
-          const array = new thing.constructor(thing.buffer);
-          str2 += `([${array}])`;
-        } else {
-          str2 += `([${stringify(thing.buffer)}])`;
-        }
-        const a = thing.byteOffset;
-        const b = a + thing.byteLength;
-        if (a > 0 || b !== thing.buffer.byteLength) {
-          const m = +/(\d+)/.exec(type)[1] / 8;
-          str2 += `.subarray(${a / m},${b / m})`;
-        }
-        return str2;
-      }
-      case "ArrayBuffer": {
-        const ui8 = new Uint8Array(thing);
-        return `new Uint8Array([${ui8.toString()}]).buffer`;
-      }
-      case "Temporal.Duration":
-      case "Temporal.Instant":
-      case "Temporal.PlainDate":
-      case "Temporal.PlainTime":
-      case "Temporal.PlainDateTime":
-      case "Temporal.PlainMonthDay":
-      case "Temporal.PlainYearMonth":
-      case "Temporal.ZonedDateTime":
-        return `${type}.from(${stringify_string(thing.toString())})`;
-      default:
-        const keys2 = Object.keys(thing);
-        const obj = keys2.map((key) => `${safe_key(key)}:${stringify(thing[key])}`).join(",");
-        const proto = Object.getPrototypeOf(thing);
-        if (proto === null) {
-          return keys2.length > 0 ? `{${obj},__proto__:null}` : `{__proto__:null}`;
-        }
-        return `{${obj}}`;
-    }
-  }
-  const str = stringify(value);
-  if (names.size) {
-    const params = [];
-    const statements = [];
-    const values = [];
-    names.forEach((name, thing) => {
-      params.push(name);
-      if (custom.has(thing)) {
-        values.push(
-          /** @type {string} */
-          custom.get(thing)
-        );
-        return;
-      }
-      if (is_primitive(thing)) {
-        values.push(stringify_primitive(thing));
-        return;
-      }
-      const type = get_type(thing);
-      switch (type) {
-        case "Number":
-        case "String":
-        case "Boolean":
-          values.push(`Object(${stringify(thing.valueOf())})`);
-          break;
-        case "RegExp":
-          values.push(thing.toString());
-          break;
-        case "Date":
-          values.push(`new Date(${thing.getTime()})`);
-          break;
-        case "Array":
-          values.push(`Array(${thing.length})`);
-          thing.forEach((v, i) => {
-            statements.push(`${name}[${i}]=${stringify(v)}`);
-          });
-          break;
-        case "Set":
-          values.push(`new Set`);
-          statements.push(
-            `${name}.${Array.from(thing).map((v) => `add(${stringify(v)})`).join(".")}`
-          );
-          break;
-        case "Map":
-          values.push(`new Map`);
-          statements.push(
-            `${name}.${Array.from(thing).map(([k, v]) => `set(${stringify(k)}, ${stringify(v)})`).join(".")}`
-          );
-          break;
-        case "ArrayBuffer":
-          values.push(
-            `new Uint8Array([${new Uint8Array(thing).join(",")}]).buffer`
-          );
-          break;
-        default:
-          values.push(
-            Object.getPrototypeOf(thing) === null ? "Object.create(null)" : "{}"
-          );
-          Object.keys(thing).forEach((key) => {
-            statements.push(
-              `${name}${safe_prop(key)}=${stringify(thing[key])}`
-            );
-          });
-      }
-    });
-    statements.push(`return ${str}`);
-    return `(function(${params.join(",")}){${statements.join(
-      ";"
-    )}}(${values.join(",")}))`;
-  } else {
-    return str;
-  }
-}
-function get_name(num) {
-  let name = "";
-  do {
-    name = chars[num % chars.length] + name;
-    num = ~~(num / chars.length) - 1;
-  } while (num >= 0);
-  return reserved.test(name) ? `${name}0` : name;
-}
-function escape_unsafe_char(c) {
-  return escaped[c] || c;
-}
-function escape_unsafe_chars(str) {
-  return str.replace(unsafe_chars, escape_unsafe_char);
-}
-function safe_key(key) {
-  return /^[_$a-zA-Z][_$a-zA-Z0-9]*$/.test(key) ? key : escape_unsafe_chars(JSON.stringify(key));
-}
-function safe_prop(key) {
-  return /^[_$a-zA-Z][_$a-zA-Z0-9]*$/.test(key) ? `.${key}` : `[${escape_unsafe_chars(JSON.stringify(key))}]`;
-}
-function stringify_primitive(thing) {
-  if (typeof thing === "string") return stringify_string(thing);
-  if (thing === void 0) return "void 0";
-  if (thing === 0 && 1 / thing < 0) return "-0";
-  const str = String(thing);
-  if (typeof thing === "number") return str.replace(/^(-)?0\./, "$1.");
-  if (typeof thing === "bigint") return thing + "n";
-  return str;
-}
+import { clsx as clsx$1 } from "clsx";
+import * as devalue from "devalue";
 var is_array = Array.isArray;
 var index_of = Array.prototype.indexOf;
 var includes = Array.prototype.includes;
@@ -319,6 +25,15 @@ function deferred() {
     reject = rej;
   });
   return { promise, resolve, reject };
+}
+function fallback(value, fallback2, lazy = false) {
+  return value === void 0 ? lazy ? (
+    /** @type {() => V} */
+    fallback2()
+  ) : (
+    /** @type {V} */
+    fallback2
+  ) : value;
 }
 const DERIVED = 1 << 1;
 const EFFECT = 1 << 2;
@@ -364,6 +79,27 @@ const ELEMENT_IS_NAMESPACED = 1;
 const ELEMENT_PRESERVE_ATTRIBUTE_CASE = 1 << 1;
 const ELEMENT_IS_INPUT = 1 << 2;
 const UNINITIALIZED = /* @__PURE__ */ Symbol();
+const VOID_ELEMENT_NAMES = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "command",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr"
+];
+function is_void(name) {
+  return VOID_ELEMENT_NAMES.includes(name) || name.toLowerCase() === "!doctype";
+}
 const DOM_BOOLEAN_ATTRIBUTES = [
   "allowfullscreen",
   "async",
@@ -401,34 +137,31 @@ const PASSIVE_EVENTS = ["touchstart", "touchmove"];
 function is_passive_event(name) {
   return PASSIVE_EVENTS.includes(name);
 }
+const RAW_TEXT_ELEMENTS = (
+  /** @type {const} */
+  ["textarea", "script", "style", "title"]
+);
+function is_raw_text_element(name) {
+  return RAW_TEXT_ELEMENTS.includes(
+    /** @type {typeof RAW_TEXT_ELEMENTS[number]} */
+    name
+  );
+}
 const ATTR_REGEX = /[&"<]/g;
 const CONTENT_REGEX = /[&<]/g;
 function escape_html(value, is_attr) {
   const str = String(value ?? "");
   const pattern = is_attr ? ATTR_REGEX : CONTENT_REGEX;
   pattern.lastIndex = 0;
-  let escaped2 = "";
+  let escaped = "";
   let last = 0;
   while (pattern.test(str)) {
     const i = pattern.lastIndex - 1;
     const ch = str[i];
-    escaped2 += str.substring(last, i) + (ch === "&" ? "&amp;" : ch === '"' ? "&quot;" : "&lt;");
+    escaped += str.substring(last, i) + (ch === "&" ? "&amp;" : ch === '"' ? "&quot;" : "&lt;");
     last = i + 1;
   }
-  return escaped2 + str.substring(last);
-}
-function r(e) {
-  var t, f, n = "";
-  if ("string" == typeof e || "number" == typeof e) n += e;
-  else if ("object" == typeof e) if (Array.isArray(e)) {
-    var o = e.length;
-    for (t = 0; t < o; t++) e[t] && (f = r(e[t])) && (n && (n += " "), n += f);
-  } else for (f in e) e[f] && (n && (n += " "), n += f);
-  return n;
-}
-function clsx$1() {
-  for (var e, t, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
-  return n;
+  return escaped + str.substring(last);
 }
 const replacements = {
   translate: /* @__PURE__ */ new Map([
@@ -885,14 +618,14 @@ class Renderer {
     };
     if (typeof body === "function") {
       this.child((renderer) => {
-        const r2 = new Renderer(this.global, this);
-        body(r2);
+        const r = new Renderer(this.global, this);
+        body(r);
         if (this.global.mode === "async") {
-          return r2.#collect_content_async().then((content) => {
+          return r.#collect_content_async().then((content) => {
             close(renderer, content.body.replaceAll("<!---->", ""), content);
           });
         } else {
-          const content = r2.#collect_content();
+          const content = r.#collect_content();
           close(renderer, content.body.replaceAll("<!---->", ""), content);
         }
       });
@@ -909,14 +642,14 @@ class Renderer {
       this.global.set_title(head2, path);
     };
     this.child((renderer) => {
-      const r2 = new Renderer(renderer.global, renderer);
-      fn(r2);
+      const r = new Renderer(renderer.global, renderer);
+      fn(r);
       if (renderer.global.mode === "async") {
-        return r2.#collect_content_async().then((content) => {
+        return r.#collect_content_async().then((content) => {
           close(content.head);
         });
       } else {
-        const content = r2.#collect_content();
+        const content = r.#collect_content();
         close(content.head);
       }
     });
@@ -1218,7 +951,7 @@ class Renderer {
         has_promises = true;
         for (const p of v.promises) await p;
       }
-      entries.push(`[${uneval(k)},${v.serialized}]`);
+      entries.push(`[${devalue.uneval(k)},${v.serialized}]`);
     }
     let prelude = `const h = (window.__svelte ??= {}).h ??= new Map();`;
     if (has_promises) {
@@ -1291,6 +1024,22 @@ class SSRState {
   }
 }
 const INVALID_ATTR_NAME_CHAR_REGEX = /[\s'">/=\u{FDD0}-\u{FDEF}\u{FFFE}\u{FFFF}\u{1FFFE}\u{1FFFF}\u{2FFFE}\u{2FFFF}\u{3FFFE}\u{3FFFF}\u{4FFFE}\u{4FFFF}\u{5FFFE}\u{5FFFF}\u{6FFFE}\u{6FFFF}\u{7FFFE}\u{7FFFF}\u{8FFFE}\u{8FFFF}\u{9FFFE}\u{9FFFF}\u{AFFFE}\u{AFFFF}\u{BFFFE}\u{BFFFF}\u{CFFFE}\u{CFFFF}\u{DFFFE}\u{DFFFF}\u{EFFFE}\u{EFFFF}\u{FFFFE}\u{FFFFF}\u{10FFFE}\u{10FFFF}]/u;
+function element(renderer, tag, attributes_fn = noop, children_fn = noop) {
+  renderer.push("<!---->");
+  if (tag) {
+    renderer.push(`<${tag}`);
+    attributes_fn();
+    renderer.push(`>`);
+    if (!is_void(tag)) {
+      children_fn();
+      if (!is_raw_text_element(tag)) {
+        renderer.push(EMPTY_COMMENT);
+      }
+      renderer.push(`</${tag}>`);
+    }
+  }
+  renderer.push("<!---->");
+}
 function render(component, options = {}) {
   if (options.csp?.hash && options.csp.nonce) {
     invalid_csp();
@@ -1341,6 +1090,65 @@ function attributes(attrs, css_hash, classes, styles, flags = 0) {
   }
   return attr_str;
 }
+function spread_props(props) {
+  const merged_props = {};
+  let key;
+  for (let i = 0; i < props.length; i++) {
+    const obj = props[i];
+    for (key in obj) {
+      const desc = Object.getOwnPropertyDescriptor(obj, key);
+      if (desc) {
+        Object.defineProperty(merged_props, key, desc);
+      } else {
+        merged_props[key] = obj[key];
+      }
+    }
+  }
+  return merged_props;
+}
+function stringify(value) {
+  return typeof value === "string" ? value : value == null ? "" : value + "";
+}
+function attr_class(value, hash, directives) {
+  var result = to_class(value, hash, directives);
+  return result ? ` class="${escape_html(result, true)}"` : "";
+}
+function attr_style(value, directives) {
+  var result = to_style(value, directives);
+  return result ? ` style="${escape_html(result, true)}"` : "";
+}
+function slot(renderer, $$props, name, slot_props, fallback_fn) {
+  var slot_fn = $$props.$$slots?.[name];
+  if (slot_fn === true) {
+    slot_fn = $$props["children"];
+  }
+  if (slot_fn !== void 0) {
+    slot_fn(renderer, slot_props);
+  }
+}
+function rest_props(props, rest) {
+  const rest_props2 = {};
+  let key;
+  for (key in props) {
+    if (!rest.includes(key)) {
+      rest_props2[key] = props[key];
+    }
+  }
+  return rest_props2;
+}
+function sanitize_props(props) {
+  const { children, $$slots, ...sanitized } = props;
+  return sanitized;
+}
+function bind_props(props_parent, props_now) {
+  for (const key in props_now) {
+    const initial_value = props_parent[key];
+    const value = props_now[key];
+    if (initial_value === void 0 && value !== void 0 && Object.getOwnPropertyDescriptor(props_parent, key)?.set) {
+      props_parent[key] = value;
+    }
+  }
+}
 function ensure_array_like(array_like_or_iterator) {
   if (array_like_or_iterator) {
     return array_like_or_iterator.length !== void 0 ? array_like_or_iterator : Array.from(array_like_or_iterator);
@@ -1348,59 +1156,70 @@ function ensure_array_like(array_like_or_iterator) {
   return [];
 }
 export {
-  setContext as $,
+  array_from as $,
   ASYNC as A,
   BOUNDARY_EFFECT as B,
   COMMENT_NODE as C,
   DIRTY as D,
   ERROR_VALUE as E,
-  STATE_SYMBOL as F,
-  object_prototype as G,
+  includes as F,
+  EFFECT_TRANSPARENT as G,
   HYDRATION_ERROR as H,
   INERT as I,
-  array_prototype as J,
-  get_descriptor as K,
-  get_prototype_of as L,
+  EFFECT_PRESERVED as J,
+  EAGER_EFFECT as K,
+  STATE_SYMBOL as L,
   MAYBE_DIRTY as M,
-  is_array as N,
-  is_extensible as O,
-  USER_EFFECT as P,
-  REACTION_IS_UPDATING as Q,
+  object_prototype as N,
+  array_prototype as O,
+  get_descriptor as P,
+  get_prototype_of as Q,
   REACTION_RAN as R,
   STALE_REACTION as S,
-  index_of as T,
+  is_array as T,
   UNINITIALIZED as U,
-  define_property as V,
+  is_extensible as V,
   WAS_MARKED as W,
-  array_from as X,
-  is_passive_event as Y,
-  LEGACY_PROPS as Z,
-  render as _,
-  attr as a,
-  head as a0,
-  escape_html as b,
-  HYDRATION_END as c,
-  HYDRATION_START as d,
+  USER_EFFECT as X,
+  REACTION_IS_UPDATING as Y,
+  index_of as Z,
+  define_property as _,
+  spread_props as a,
+  is_passive_event as a0,
+  LEGACY_PROPS as a1,
+  render as a2,
+  setContext as a3,
+  head as a4,
+  clsx as a5,
+  attr_style as a6,
+  rest_props as a7,
+  fallback as a8,
+  attributes as a9,
+  element as aa,
+  bind_props as ab,
+  slot as b,
+  attr as c,
+  attr_class as d,
   ensure_array_like as e,
-  HYDRATION_START_ELSE as f,
-  getContext as g,
-  EFFECT as h,
-  CONNECTED as i,
-  CLEAN as j,
-  DERIVED as k,
-  BLOCK_EFFECT as l,
-  deferred as m,
+  stringify as f,
+  escape_html as g,
+  getContext as h,
+  HYDRATION_END as i,
+  HYDRATION_START as j,
+  HYDRATION_START_ELSE as k,
+  EFFECT as l,
+  CONNECTED as m,
   noop as n,
-  BRANCH_EFFECT as o,
-  ROOT_EFFECT as p,
-  RENDER_EFFECT as q,
+  CLEAN as o,
+  DERIVED as p,
+  BLOCK_EFFECT as q,
   run_all as r,
-  MANAGED_EFFECT as s,
-  HEAD_EFFECT as t,
-  uneval as u,
-  DESTROYED as v,
-  includes as w,
-  EFFECT_TRANSPARENT as x,
-  EFFECT_PRESERVED as y,
-  EAGER_EFFECT as z
+  sanitize_props as s,
+  deferred as t,
+  BRANCH_EFFECT as u,
+  ROOT_EFFECT as v,
+  RENDER_EFFECT as w,
+  MANAGED_EFFECT as x,
+  HEAD_EFFECT as y,
+  DESTROYED as z
 };
