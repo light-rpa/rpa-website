@@ -8,7 +8,7 @@
 	let { children } = $props();
 	let mobileOpen = $state(false);
 	const siteUrl = 'https://rpa.ro';
-	const canonicalUrl = $derived(() => new URL(page.url.pathname + page.url.search, siteUrl).toString());
+	const canonicalUrl = $derived(new URL(page.url.pathname + page.url.search, siteUrl).toString());
 	const structuredOrganization = {
 		'@context': 'https://schema.org',
 		'@type': 'Organization',
