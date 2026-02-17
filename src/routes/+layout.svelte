@@ -1,5 +1,10 @@
 <script lang="ts">
 	import '../app.css';
+	import { page } from '$app/state';
+	import InfinityLogo from '$lib/components/InfinityLogo.svelte';
+	import CookieConsent from '$lib/components/CookieConsent.svelte';
+	import { Mail, Phone, MapPin } from 'lucide-svelte';
+
 	let { children } = $props();
 	let mobileOpen = $state(false);
 
@@ -10,20 +15,36 @@
 		{ href: '/industrii', label: 'Industrii' },
 		{ href: '/contact', label: 'Contact' }
 	];
+
+	function isActive(href: string): boolean {
+		if (href === '/') return page.url.pathname === '/';
+		return page.url.pathname.startsWith(href);
+	}
 </script>
 
 <!-- Navbar -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-rpa-navy/95 backdrop-blur-sm border-b border-white/10">
 	<nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-		<a href="/" class="flex items-center gap-2">
-			<span class="text-2xl font-bold text-white tracking-tight">R.P.A.</span>
-			<span class="hidden sm:inline text-xs text-rpa-accent tracking-widest uppercase">Robotic Process Automation</span>
+		<a href="/" class="flex items-center gap-3">
+			<InfinityLogo size={36} />
+			<div class="flex flex-col">
+				<span class="text-xl font-bold text-white tracking-tight leading-none">R.P.A.</span>
+				<span class="hidden sm:inline text-[10px] text-rpa-accent tracking-[0.2em] uppercase leading-none mt-0.5">Robotic Process Automation</span>
+			</div>
 		</a>
 
 		<!-- Desktop nav -->
 		<div class="hidden md:flex items-center gap-8">
 			{#each navLinks as link}
-				<a href={link.href} class="text-sm text-gray-300 hover:text-rpa-accent transition-colors duration-200">{link.label}</a>
+				<a
+					href={link.href}
+					class="text-sm transition-colors duration-200 relative {isActive(link.href) ? 'text-white font-semibold' : 'text-gray-400 hover:text-rpa-accent'}"
+				>
+					{link.label}
+					{#if isActive(link.href)}
+						<span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-rpa-accent rounded-full"></span>
+					{/if}
+				</a>
 			{/each}
 		</div>
 
@@ -41,7 +62,11 @@
 	{#if mobileOpen}
 		<div class="md:hidden bg-rpa-navy border-t border-white/10 px-6 py-4 space-y-3">
 			{#each navLinks as link}
-				<a href={link.href} class="block text-gray-300 hover:text-rpa-accent transition-colors" onclick={() => mobileOpen = false}>{link.label}</a>
+				<a
+					href={link.href}
+					class="block transition-colors {isActive(link.href) ? 'text-rpa-accent font-semibold' : 'text-gray-300 hover:text-rpa-accent'}"
+					onclick={() => mobileOpen = false}
+				>{link.label}</a>
 			{/each}
 		</div>
 	{/if}
@@ -58,8 +83,13 @@
 		<div class="grid md:grid-cols-4 gap-8">
 			<!-- Brand -->
 			<div class="md:col-span-2">
-				<div class="text-2xl font-bold text-white mb-2">R.P.A.</div>
-				<p class="text-sm text-rpa-accent mb-4 tracking-widest uppercase">Robotic Process Automation</p>
+				<div class="flex items-center gap-3 mb-4">
+					<InfinityLogo size={32} />
+					<div>
+						<div class="text-xl font-bold text-white leading-none">R.P.A.</div>
+						<div class="text-[10px] text-rpa-accent tracking-[0.2em] uppercase mt-0.5">Robotic Process Automation</div>
+					</div>
+				</div>
 				<p class="text-sm leading-relaxed">
 					Soluții de automatizare industrială, viziune artificială și integrare robotică.
 					Partener autorizat SICK.
@@ -80,10 +110,19 @@
 			<!-- Contact -->
 			<div>
 				<h4 class="text-white font-semibold mb-4">Contact</h4>
-				<div class="space-y-2 text-sm">
-					<a href="mailto:office@rpa.ro" class="block hover:text-rpa-accent transition-colors">office@rpa.ro</a>
-					<a href="tel:+40751271751" class="block hover:text-rpa-accent transition-colors">+40 751 271 751</a>
-					<p>România</p>
+				<div class="space-y-3 text-sm">
+					<a href="mailto:office@rpa.ro" class="flex items-center gap-2 hover:text-rpa-accent transition-colors">
+						<Mail class="w-4 h-4 text-rpa-accent" />
+						office@rpa.ro
+					</a>
+					<a href="tel:+40751271751" class="flex items-center gap-2 hover:text-rpa-accent transition-colors">
+						<Phone class="w-4 h-4 text-rpa-accent" />
+						+40 751 271 751
+					</a>
+					<p class="flex items-center gap-2">
+						<MapPin class="w-4 h-4 text-rpa-accent" />
+						România
+					</p>
 				</div>
 			</div>
 		</div>
@@ -95,3 +134,5 @@
 		</div>
 	</div>
 </footer>
+
+<CookieConsent />
