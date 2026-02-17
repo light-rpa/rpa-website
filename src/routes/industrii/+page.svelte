@@ -39,7 +39,7 @@
 	<div class="max-w-7xl mx-auto px-6 lg:px-8">
 		<div class="grid md:grid-cols-2 gap-8">
 			{#each industries as ind, i}
-				<div class="reveal bg-rpa-gray rounded-2xl p-10 border border-gray-100 hover-lift" style="transition-delay: {i * 100}ms">
+				<div class="bg-rpa-gray rounded-2xl p-10 border border-gray-100 hover-lift" style="transition-delay: {i * 100}ms" use:reveal>
 					<div class="flex items-center gap-5 mb-8">
 						<div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center border border-gray-100 shrink-0">
 							{@html ind.icon}
@@ -64,7 +64,7 @@
 <!-- CTA -->
 <section class="relative py-28 bg-rpa-navy text-white overflow-hidden grain grid-pattern">
 	<div class="absolute inset-0 bg-gradient-to-br from-rpa-navy via-rpa-blue-dark/30 to-rpa-navy"></div>
-	<div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-8 text-center reveal">
+	<div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-8 text-center" use:reveal>
 		<h2 class="font-heading text-3xl md:text-4xl font-bold mb-6">Nu Găsești Industria Ta?</h2>
 		<p class="text-gray-300/90 mb-10 text-lg">Soluțiile noastre sunt flexibile și adaptabile. Contactați-ne pentru a discuta despre sectorul dumneavoastră.</p>
 		<a href="/contact" class="inline-flex items-center gap-2 bg-rpa-accent hover:bg-rpa-accent-light text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200">
@@ -75,6 +75,8 @@
 </section>
 
 <script lang="ts">
+	import { reveal } from '$lib/actions/animate';
+
 	const industries = [
 		{
 			icon: '<svg class="w-8 h-8 text-rpa-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M12 7V3"/><path d="M9 17v2"/><path d="M15 17v2"/><path d="M7 11h10"/><path d="M7 13h6"/></svg>',
